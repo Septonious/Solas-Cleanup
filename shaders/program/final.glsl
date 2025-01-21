@@ -11,7 +11,8 @@ const float wetnessHalflife = 128.0;
 
 //Buffer Options//
 /*
-const int colortex0Format = R11F_G11F_B10F; //Main Scene
+const int colortex0Format = R11F_G11F_B10F; //Main scene
+const int colortex2Format = RGBA16; //Temporal data
 */
 
 //Varyings//

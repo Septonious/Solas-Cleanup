@@ -120,7 +120,7 @@ uniform mat4 gbufferModelView, gbufferModelViewInverse;
 
 //Includes//
 #ifdef TAA
-#include "/lib/util/jitter.glsl"
+#include "/lib/antialiasing/jitter.glsl"
 #endif
 
 //Program//

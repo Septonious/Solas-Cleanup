@@ -61,6 +61,10 @@ vec3 lightVec = sunVec;
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 
+#ifdef TAA
+#include "/lib/antialiasing/jitter.glsl"
+#endif
+
 //Program//
 void main() {
 	vec4 albedo = texture2D(texture, texCoord);
@@ -77,7 +81,11 @@ void main() {
 	float parallaxShadow = 0.0;
 
 	vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
+	#ifdef TAA
+	vec3 viewPos = ToNDC(vec3(TAAJitter(screenPos.xy, -0.5), screenPos.z));
+	#else
 	vec3 viewPos = ToNDC(screenPos);
+	#endif
 	vec3 worldPos = ToWorld(viewPos);
 	vec2 lightmap = clamp(lmCoord, 0.0, 1.0);
 
@@ -110,6 +118,10 @@ out vec2 texCoord, lmCoord;
 flat out int mat;
 
 //Uniforms//
+#ifdef TAA
+uniform float viewWidth, viewHeight;
+#endif
+
 #if defined OVERWORLD || defined END
 uniform float timeAngle;
 #endif
@@ -121,6 +133,11 @@ attribute vec4 at_tangent;
 attribute vec4 at_midBlock;
 attribute vec4 mc_Entity;
 attribute vec4 mc_midTexCoord;
+
+//Includes//
+#ifdef TAA
+#include "/lib/antialiasing/jitter.glsl"
+#endif
 
 //Program//
 void main() {
@@ -151,6 +168,10 @@ void main() {
 	color = gl_Color;
 
 	gl_Position = gl_ProjectionMatrix * gbufferModelView * position;
+
+    #ifdef TAA
+    gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
+    #endif
 
 	#ifndef DRM_S0L4S
 	texCoord.x = texCoord.y;
