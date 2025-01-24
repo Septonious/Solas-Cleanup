@@ -26,7 +26,7 @@ void getSunMoon(inout vec3 color, in vec3 nViewPos, in vec3 worldPos, in vec3 li
 		if (moonPhase == 0) {
 			worldPos = normalize(worldPos);
 			vec2 planeCoord = worldPos.xz / (worldPos.y + length(worldPos));
-			moonColor *= texture2D(noisetex, planeCoord * 0.9).r + 0.5;
+			moonColor *= texture2D(noisetex, planeCoord * 0.9).r + 0.3;
 		}
 
 		vec3 sunMoonColor = sunColor + moonColor + glareColor;
