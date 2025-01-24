@@ -126,6 +126,12 @@ uniform float viewWidth, viewHeight;
 uniform float timeAngle;
 #endif
 
+#if defined WAVING_LEAVES || defined WAVING_PLANTS
+uniform float frameTimeCounter;
+
+uniform vec3 cameraPosition;
+#endif
+
 uniform mat4 gbufferModelView, gbufferModelViewInverse;
 
 //Attributes//
@@ -137,6 +143,10 @@ attribute vec4 mc_midTexCoord;
 //Includes//
 #ifdef TAA
 #include "/lib/antialiasing/jitter.glsl"
+#endif
+
+#if defined WAVING_LEAVES || defined WAVING_PLANTS
+#include "/lib/util/waving.glsl"
 #endif
 
 //Program//
@@ -164,6 +174,11 @@ void main() {
 
 	//Color & Position
 	vec4 position = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
+
+	#if defined WAVING_PLANTS || defined WAVING_LEAVES
+	float istopv = gl_MultiTexCoord0.t < mc_midTexCoord.t ? 1.0 : 0.0;
+	position.xyz = getWavingBlocks(position.xyz, istopv, lmCoord.y);
+	#endif
 
 	color = gl_Color;
 

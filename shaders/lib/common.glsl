@@ -207,8 +207,8 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 //Waving//
 #define WAVING_PLANTS
 #define WAVING_LEAVES
-#define WAVING_AMPLITUDE 2.50 //[1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
-#define WAVING_SPEED 1.2 //[0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5]
+#define WAVING_AMPLITUDE 2.25 //[1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
+#define WAVING_SPEED 1.1 //[0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5]
 
 //Colors//
 #define PURPLE_MORNINGS
