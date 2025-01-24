@@ -12,6 +12,7 @@ const float wetnessHalflife = 128.0;
 //Buffer Options//
 /*
 const int colortex0Format = R11F_G11F_B10F; //Main scene
+const int colortex1Format = RGB8; //raw translucent, vl, bloom, final scene
 const int colortex2Format = RGBA16; //Temporal data
 */
 

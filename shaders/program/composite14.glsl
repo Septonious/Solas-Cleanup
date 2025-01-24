@@ -79,7 +79,9 @@ void main() {
 	#endif
 
 	//Tonemapping
+	color = pow(color, vec3(2.2));
 	color = Uncharted2Tonemap(color * TONEMAP_BRIGHTNESS) / Uncharted2Tonemap(vec3(TONEMAP_WHITE_THRESHOLD));
+	color = pow(color, vec3(1.0 / 2.2));
 
 	//Film Grain
     color += vec3((dither - 0.25) / 128.0);

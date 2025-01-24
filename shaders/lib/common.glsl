@@ -18,8 +18,8 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 //#define ENTITY_SHADOWS
 
 //Tonemap//
-#define TONEMAP_CONTRAST 2.4 //[1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6 2.8 3.0 3.2 3.4 3.6 3.8 4.0]
-#define TONEMAP_BRIGHTNESS 3.0 //[2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0]
+#define TONEMAP_CONTRAST 2.0 //[1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6 2.8 3.0 3.2 3.4 3.6 3.8 4.0]
+#define TONEMAP_BRIGHTNESS 2.8 //[2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0 4.1 4.2 4.3 4.4 4.5 4.6 4.7 4.8 4.9 5.0]
 #define TONEMAP_WHITE_THRESHOLD 2.8 //[2.0 2.2 2.4 2.8 3.4 4.0 5.0 7.0 9.0 13.0]
 #define TONEMAP_HIGHLIGHTS 0.38 //[0.10 0.12 0.14 0.16 0.18 0.20 0.22 0.24 0.26 0.28 0.30 0.32 0.34 0.36 0.38 0.40 0.42 0.44 0.46 0.48 0.50]
 #define TONEMAP_SHADOWS 0.10 //[0.05 0.06 0.07 0.08 0.09 0.10 0.11 0.12 0.13 0.14 0.15]
@@ -29,7 +29,7 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 #define STAR_BRIGHTNESS 1.50 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
 #define STAR_AMOUNT 1.00 //[0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25]
 
-#define AURORA
+//#define AURORA
 #define AURORA_BRIGHTNESS 0.7 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 #define AURORA_COLD_BIOME_VISIBILITY
 #define AURORA_FULL_MOON_VISIBILITY
@@ -105,7 +105,7 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 
 //Bloom//
 #define BLOOM
-#define BLOOM_STRENGTH 2.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
+#define BLOOM_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
 #define BLOOM_CONTRAST 1 //[-4 -3 -2 -1 0 1 2 3 4]
 #define BLOOM_TILE_SIZE 0.0 //[0.0 0.5 1.0 1.5 2.0]
 
@@ -217,12 +217,12 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 #define LIGHTTEMP_D 5500 //[5000 5250 5500 5750 6000]
 #define LIGHTTEMP_N 11750 //[11000 11250 11500 11750 12000]
 
-#define LIGHTINTENSITY_SS 1.3 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
-#define LIGHTINTENSITY_ME 1.4 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
-#define LIGHTINTENSITY_D 1.5 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
-#define LIGHTINTENSITY_N 0.7 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define LIGHTINTENSITY_SS 1.2 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+#define LIGHTINTENSITY_ME 1.3 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+#define LIGHTINTENSITY_D 1.4 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+#define LIGHTINTENSITY_N 0.2 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 
-#define AMBIENTINTENSITY_D 1.20 //[0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25]
+#define AMBIENTINTENSITY_D 1.45 //[1.00 1.05 1.10 1.15 1.20 1.25 1.30 1.35 1.40 1.45 1.50 1.55 1.60 1.65 1.70 1.75]
 #define AMBIENTINTENSITY_N 0.60 //[0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
 #define AMBIENTCOL_SKY_INFLUENCE 0.6 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
 

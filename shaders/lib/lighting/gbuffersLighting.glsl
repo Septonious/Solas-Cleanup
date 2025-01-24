@@ -2,7 +2,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
                     in float NoU, in float NoL, in float NoE,
                     in float subsurface, in float smoothness, in float emission, in float parallaxShadow) {
     //Variables
-    float originalNoL = NoL;
+    float NoLm = NoL;
     float lViewPos = length(viewPos.xz);
     float ao = color.a * color.a;
     vec3 worldNormal = normalize(ToWorld(normal * 1000000.0));
@@ -35,9 +35,9 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
             float VoL = clamp(dot(normalize(viewPos), lightVec), 0.0, 1.0);
             sss = pow8(VoL) * shadowFade * (1.0 - wetness * 0.5);
             if (subsurface > 0.49 && subsurface < 0.51) { //Leaves
-                NoL += 0.5 * shadowLightingFade * (0.75 + sss * 0.75);
+                NoLm += 0.5 * shadowLightingFade * (0.75 + sss * 0.75);
             } else { //Foliage
-                NoL += shadowLightingFade * (0.35 + sss) * (1.0 - float(subsurface > 0.29 && subsurface < 0.31) * 0.5);
+                NoLm += shadowLightingFade * (0.35 + sss) * (1.0 - float(subsurface > 0.29 && subsurface < 0.31) * 0.5);
             }
         }
         #endif
@@ -53,7 +53,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
             //Shadow bias without peter-panning
             float distanceBias = pow(dot(worldPos, worldPos), 0.75);
                   distanceBias = 0.12 + 0.0008 * distanceBias;
-            vec3 bias = worldNormal * distanceBias * (2.0 - 0.95 * max(NoL, 0.0));
+            vec3 bias = worldNormal * distanceBias * (2.0 - 0.95 * max(NoLm, 0.0));
 
             //Fix light leaking in caves
             if (lightmapS < 0.999) {
@@ -82,21 +82,24 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
         shadow = computeShadow(shadowPos, offset, lightmap.y, subsurface, viewDistance);
     }
 
+    vec3 realShadow = shadow;
     vec3 fakeShadow = getFakeShadow(lightmap.y);
-
-    shadow = mix(fakeShadow, shadow, vec3(shadowLightingFade));
 
     #if defined PBR && defined GBUFFERS_TERRAIN
     shadow *= parallaxShadow;
+    fakeShadow *= parallaxShadow;
     #endif
 
-    shadow *= clamp(NoL * 1.01 - 0.01, 0.0, 1.0);
+    shadow *= clamp(NoLm * 1.01 - 0.01, 0.0, 1.0);
+    fakeShadow *= pow(NoL, 2.0 - timeBrightness);
+
+    shadow = mix(fakeShadow, shadow, vec3(shadowLightingFade));
 
     //Main Lighting
     #ifdef OVERWORLD
     float rainFactor = 1.0 - wetness * 0.75;
     vec3 sceneLighting = mix(ambientCol * pow4(lightmap.y), lightCol, shadow * rainFactor * shadowFade);
-         sceneLighting *= 1.0 + sss * shadow;
+         sceneLighting *= 1.0 + sss * realShadow * shadowLightingFade;
     #elif defined END
     vec3 sceneLighting = mix(endAmbientCol, endLightCol, shadow) * 0.25;
     #elif defined NETHER
