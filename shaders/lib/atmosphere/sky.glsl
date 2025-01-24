@@ -26,7 +26,7 @@ vec3 getAtmosphericScattering(vec3 viewPos, vec3 lightPos) {
           VoSClamped = pow(VoSClamped, 1.25);
 
     //Prepare scattering properties
-    float skyDensity = exp(-0.75 * pow(VoUClamped, 2.0 - timeBrightness));
+    float skyDensity = exp(-0.75 * pow(VoUClamped, 1.5 - timeBrightness * 0.75));
     float scatteringWidth = pow(1.0 - VoUClamped, 2.0 - VoSClamped) * pow3(min(1.0 + VoURaw, 1.0));
 
     float sunScatteringMixer = (1.0 - timeBrightness * 0.5) * (1.0 - wetness * 0.45) * VoSClamped;
