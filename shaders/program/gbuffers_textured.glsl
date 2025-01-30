@@ -44,6 +44,9 @@ uniform vec3 cameraPosition;
 uniform sampler2D texture;
 uniform sampler2D noisetex;
 
+uniform sampler3D floodfillSampler, floodfillSamplerCopy;
+uniform usampler3D voxelSampler;
+
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 shadowProjection;
@@ -65,6 +68,8 @@ vec3 lightVec = sunVec;
 #include "/lib/util/ToShadow.glsl"
 #include "/lib/color/lightColor.glsl"
 #include "/lib/color/netherColor.glsl"
+#include "/lib/vx/blocklightColor.glsl"
+#include "/lib/vx/voxelization.glsl"
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 

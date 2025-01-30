@@ -47,11 +47,26 @@ out vec3 worldPos, normal;
 out vec4 color;
 
 //Uniforms//
+#ifdef VX_SUPPORT
+uniform int renderStage;
+
+uniform vec3 cameraPosition;
+
+#extension GL_ARB_shader_image_load_store : enable
+writeonly uniform uimage3D voxel_img;
+#endif
+
 uniform mat4 shadowProjection, shadowProjectionInverse;
 uniform mat4 shadowModelView, shadowModelViewInverse;
 
 //Attributes//
+attribute vec3 at_midBlock;
 attribute vec4 mc_Entity;
+
+//Includes//
+#ifdef VX_SUPPORT
+#include "/lib/vx/voxelization.glsl"
+#endif
 
 //Program//
 void main() {
@@ -67,6 +82,11 @@ void main() {
 
 	//Materials
 	mat = int(mc_Entity.x);
+
+    //Voxel map
+	#ifdef VX_SUPPORT
+    if (gl_VertexID % 4 == 0) updateVoxelMap(int(max(mc_Entity.x - 10000, 0)));
+	#endif
 
 	//Color & Position
 	color = gl_Color;

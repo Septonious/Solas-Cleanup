@@ -14,11 +14,45 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
           vanillaDiffuse = mix(1.0, vanillaDiffuse, lightmap.y);
     #endif
 
+
     //Block Lighting
     float blockLightMap = pow6(lightmap.x * lightmap.x) * 3.0 + max(lightmap.x - 0.05, 0.0);
-         blockLightMap *= blockLightMap * 0.5;
+          blockLightMap *= blockLightMap * 0.5;
 
     vec3 blockLighting = blockLightCol * blockLightMap * (1.0 - min(emission, 1.0));
+
+    //Floodfill lighting
+    #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS
+    vec3 voxelPos = ToVoxel(worldPos);
+
+    float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.5));
+          floodfillFade = clamp(floodfillFade, 0.0, 1.0);
+
+    vec3 voxelLighting = vec3(0.0);
+
+    if (isInsideVoxelVolume(voxelPos)) {
+        vec3 voxelSamplePos = voxelPos + worldNormal;
+             voxelSamplePos /= voxelVolumeSize;
+             voxelSamplePos = clamp(voxelSamplePos, 0.0, 1.0);
+
+        vec3 lighting = vec3(0.0);
+        if ((frameCounter & 1) == 0) {
+            lighting = texture3D(floodfillSamplerCopy, voxelSamplePos).rgb;
+        } else {
+            lighting = texture3D(floodfillSampler, voxelSamplePos).rgb;
+        }
+        voxelLighting = pow(lighting, vec3(1.0 / FLOODFILL_RADIUS));
+        voxelLighting *= 0.5 + 0.5 * length(voxelLighting);
+
+        #ifdef GBUFFERS_ENTITIES
+        voxelLighting += pow16(lightmap.x) * blockLightCol;
+        #endif
+
+        float mixFactor = 1.0 - floodfillFade * floodfillFade;
+
+        blockLighting = mix(blockLighting, voxelLighting * FLOODFILL_BRIGHTNESS, mixFactor * 0.95);
+    }
+    #endif
 
     //Shadow Calculation
     //Some code made by Emin and gri573

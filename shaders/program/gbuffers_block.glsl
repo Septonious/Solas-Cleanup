@@ -36,6 +36,9 @@ uniform vec3 fogColor;
 uniform sampler2D texture;
 uniform sampler2D noisetex;
 
+uniform sampler3D floodfillSampler, floodfillSamplerCopy;
+uniform usampler3D voxelSampler;
+
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 shadowProjection;
@@ -69,6 +72,8 @@ const vec3[8] endPortalColors = vec3[8](
 #include "/lib/util/bayerDithering.glsl"
 #include "/lib/color/lightColor.glsl"
 #include "/lib/color/netherColor.glsl"
+#include "/lib/vx/blocklightColor.glsl"
+#include "/lib/vx/voxelization.glsl"
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 
