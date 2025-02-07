@@ -5,8 +5,6 @@ float texture2DShadow(sampler2D shadowtex, vec3 shadowPos) {
 }
 
 #ifdef VC
-uniform vec4 lightningBoltPosition;
-
 float lightningFlashEffect(vec3 worldPos, vec3 lightningBoltPosition, float lightDistance){ //Thanks to Xonk!
     vec3 lightningPos = worldPos - vec3(lightningBoltPosition.x, max(worldPos.y, lightningBoltPosition.y), lightningBoltPosition.z);
 
@@ -143,8 +141,17 @@ void computeVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1, f
 				#endif
 
                 vec3 worldPos = rayPos - cameraPosition;
+				float rayDistance = length(worldPos.xz) * 0.085;
 
-				#ifdef VC_SHADOWS
+				#ifndef DISTANT_HORIZONS
+				float fog = pow16(smoothstep(mix(VC_DISTANCE, 300, wetness), 16.0, rayDistance)); //Fog
+				#else
+				float fog = pow16(smoothstep(mix(VC_DISTANCE * 2.0, 300, wetness), 16.0, rayDistance)); //Fog
+				#endif
+
+				if (fog < 0.01) break;
+
+				#ifdef VC_LIGHTRAYS
 				float shadow1 = clamp(texture2DShadow(shadowtex1, ToShadow(worldPos)), 0.0, 1.0);
 				#else
 				float shadow1 = 1.0;
@@ -158,24 +165,19 @@ void computeVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1, f
 				#endif
 
 				float noise = 0.0;
-				float rayDistance = length(worldPos.xz) * 0.085;
 				float attenuation = smoothstep(height, cloudTop, rayPos.y);
 
 				getCloudSample(rayPos.xz, wind, attenuation, amount, frequency, thickness, density, detail, noise);
 
 				float sampleLighting = pow(attenuation, 0.9 - halfVoLSqr * 0.2);
 					  sampleLighting *= 1.0 - pow(noise, noiseLightFactor) * 0.9 + 0.1;
-				#ifdef VC_SHADOWS
+				#ifdef VC_LIGHTRAYS
 					  sampleLighting *= mix(1.0, 0.25 + shadow1 * 0.75, float(length(worldPos) < shadowDistance));
 				#endif
 
 				cloudLighting = mix(cloudLighting, sampleLighting, noise * (1.0 - cloud * cloud));
 				cloud = mix(cloud, 1.0, noise);
-				#ifndef DISTANT_HORIZONS
-				noise *= pow16(smoothstep(mix(VC_DISTANCE, 300, wetness), 16.0, rayDistance)); //Fog
-				#else
-				noise *= pow16(smoothstep(mix(VC_DISTANCE * 2.0, 300, wetness), 16.0, rayDistance)); //Fog
-				#endif
+				noise *= fog;
 				cloudAlpha = mix(cloudAlpha, 1.0, noise);
 
                 float lightning = min(lightningFlashEffect(worldPos, lightningBoltPosition.xyz, 256.0) * lightningBoltPosition.w * 4.0, 1.0);
