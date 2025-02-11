@@ -16,6 +16,10 @@ uniform int isEyeInWater;
 uniform int frameCounter;
 uniform int blockEntityId;
 
+#ifdef DYNAMIC_HANDLIGHT
+uniform int heldItemId, heldItemId2;
+#endif
+
 uniform float viewWidth, viewHeight;
 uniform float blindFactor;
 uniform float nightVision;
@@ -74,6 +78,12 @@ const vec3[8] endPortalColors = vec3[8](
 #include "/lib/color/netherColor.glsl"
 #include "/lib/vx/blocklightColor.glsl"
 #include "/lib/vx/voxelization.glsl"
+
+#ifndef NETHER
+#include "/lib/pbr/ggx.glsl"
+#endif
+
+#include "/lib/lighting/handlight.glsl"
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 

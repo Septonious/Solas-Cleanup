@@ -17,6 +17,10 @@ uniform int isEyeInWater;
 uniform int frameCounter;
 uniform int currentRenderedItemId;
 
+#ifdef DYNAMIC_HANDLIGHT
+uniform int heldItemId, heldItemId2;
+#endif
+
 uniform float viewWidth, viewHeight;
 uniform float blindFactor;
 uniform float nightVision;
@@ -64,8 +68,18 @@ vec3 lightVec = sunVec;
 #include "/lib/color/netherColor.glsl"
 #include "/lib/vx/blocklightColor.glsl"
 #include "/lib/vx/voxelization.glsl"
+
+#ifndef NETHER
+#include "/lib/pbr/ggx.glsl"
+#endif
+
+#include "/lib/lighting/handlight.glsl"
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
+
+#if defined GENERATED_EMISSION || defined GENERATED_SPECULAR
+#include "/lib/pbr/generatedPBR.glsl"
+#endif
 
 //Program//
 void main() {
@@ -96,6 +110,10 @@ void main() {
 		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
 		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
+
+		#if defined GENERATED_EMISSION || defined GENERATED_SPECULAR
+		generateIPBR(albedo, worldPos, viewPos, lightmap, emission, smoothness, metalness, subsurface);
+		#endif
 
 		vec3 shadow = vec3(0.0);
 		gbuffersLighting(albedo, screenPos, viewPos, worldPos, newNormal, shadow, lightmap, NoU, NoL, NoE, subsurface, smoothness, emission, 0.0);

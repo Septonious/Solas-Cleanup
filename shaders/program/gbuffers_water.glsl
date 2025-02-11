@@ -124,7 +124,7 @@ vec3 lightVec = sunVec;
 #include "/lib/pbr/waterReflection.glsl"
 #endif
 
-#ifdef OVERWORLD
+#ifndef NETHER
 #include "/lib/pbr/ggx.glsl"
 #endif
 

@@ -140,6 +140,27 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     vec3 sceneLighting = pow(netherColSqrt, vec3(0.75)) * 0.03;
     #endif
 
+    //Specular Highlight
+    vec3 specularHighlight = vec3(0.0);
+
+    #if (defined GBUFFERS_TERRAIN || defined GBUFFERS_ENTITIES || defined GBUFFERS_BLOCK) && !defined NETHER
+    if (emission < 0.01) {
+        vec3 baseReflectance = vec3(0.1);
+
+        float smoothnessF = 0.15 + length(albedo.rgb) * 0.2 + NoL * 0.2;
+              smoothnessF = mix(smoothnessF, 0.95, smoothness);
+              smoothnessF *= float(sss < 0.001);
+
+        #ifdef OVERWORLD
+        specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF, baseReflectance, lightCol, shadow * vanillaDiffuse, color.a);
+        #else
+        specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF, baseReflectance, endLightCol, shadow * vanillaDiffuse, color.a);
+        #endif
+
+        specularHighlight = clamp(specularHighlight, vec3(0.0), vec3(3.0));
+    }
+    #endif
+
     //Minimal Lighting
     #if defined OVERWORLD || defined END
     sceneLighting += minLightCol * (1.0 - lightmap.y);
@@ -147,6 +168,27 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
 
     //Night vision
     sceneLighting += nightVision * vec3(0.1, 0.15, 0.1);
+
+    //Aurora Lighting
+    #if defined AURORA && defined AURORA_LIGHTING_INFLUENCE && !defined GBUFFERS_TEXTURED && !defined GBUFFERS_WATER && !defined GBUFFERS_BASIC
+	float visibilityMultiplier = pow8(1.0 - sunVisibility) * (1.0 - wetness) * pow4(lightmap.y) * AURORA_BRIGHTNESS;
+	float auroraVisibility = 0.0;
+
+	#ifdef AURORA_FULL_MOON_VISIBILITY
+	auroraVisibility = mix(auroraVisibility, 1.0, float(moonPhase == 0));
+	#endif
+
+	#ifdef AURORA_COLD_BIOME_VISIBILITY
+	auroraVisibility = mix(auroraVisibility, 1.0, isSnowy);
+	#endif
+
+    #ifdef AURORA_ALWAYS_VISIBLE
+    auroraVisibility = 1.0;
+    #endif
+
+	auroraVisibility *= visibilityMultiplier;
+    sceneLighting += vec3(0.4, 2.5, 0.9) * 0.005 * auroraVisibility * (0.5 + NoU * 0.5);
+    #endif
 
     //Vanilla AO
     #ifdef VANILLA_AO
@@ -156,5 +198,6 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
 
     albedo.rgb = pow(albedo.rgb, vec3(2.2));
     albedo.rgb *= sceneLighting * vanillaDiffuse + blockLighting + emission;
+    albedo.rgb += specularHighlight;
     albedo.rgb = pow(albedo.rgb, vec3(1.0 / 2.2));
 }
