@@ -164,6 +164,7 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 #define SHARPENING
 
 //Water//
+//#define VANILLA_WATER
 #define WATER_REFLECTIONS
 #define WATER_NORMALS 1 //[0 1 2]
 #define WATER_NORMAL_BUMP 0.5 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
@@ -480,7 +481,7 @@ float linearStep(float edge0, float edge1, float x) {
 #undef VPS
 #endif
 
-#ifdef GBUFFERS_BASIC
+#if defined GBUFFERS_BASIC || defined GBUFFERS_WATER
 #undef DYNAMIC_HANDLIGHT
 #endif
 

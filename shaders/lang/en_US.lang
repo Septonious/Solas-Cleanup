@@ -134,6 +134,7 @@ option.END_VORTEX_ARMS=Vortex Arms Count
 
 screen.WATER=Water
 
+option.VANILLA_WATER=Vanilla Water Texture
 option.WATER_FOG=Water Fog
 option.WATER_FOG_EXPONENT=Water Fog Exponent
 option.WATER_CAUSTICS=Water Caustics

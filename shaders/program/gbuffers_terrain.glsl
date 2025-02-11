@@ -7,14 +7,26 @@
 
 //Varyings//
 in vec4 color;
-in vec3 normal;
 in vec3 eastVec, sunVec, upVec;
+in vec3 normal, binormal, tangent;
 in vec2 texCoord, lmCoord;
 flat in int mat;
+
+#if defined GENERATED_NORMALS || defined PARALLAX || defined SELF_SHADOW || defined PBR
+in float dist;
+flat in vec2 absMidCoordPos;
+in vec2 signMidCoordPos;
+in vec3 viewVector;
+in vec4 vTexCoord, vTexCoordAM;
+#endif
 
 //Uniforms//
 uniform int isEyeInWater;
 uniform int frameCounter;
+
+#ifdef DYNAMIC_HANDLIGHT
+uniform int heldItemId, heldItemId2;
+#endif
 
 uniform float viewWidth, viewHeight;
 uniform float blindFactor;
@@ -29,6 +41,7 @@ uniform float wetness;
 uniform ivec2 eyeBrightnessSmooth;
 #endif
 
+uniform ivec2 atlasSize;
 uniform vec3 skyColor;
 uniform vec3 fogColor;
 uniform vec3 cameraPosition;
@@ -64,10 +77,19 @@ vec3 lightVec = sunVec;
 #include "/lib/vx/blocklightColor.glsl"
 #include "/lib/vx/voxelization.glsl"
 #include "/lib/lighting/shadows.glsl"
+#include "/lib/lighting/handlight.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 
 #ifdef TAA
 #include "/lib/antialiasing/jitter.glsl"
+#endif
+
+#if defined GENERATED_EMISSION || defined GENERATED_SPECULAR
+#include "/lib/pbr/generatedPBR.glsl"
+#endif
+
+#ifdef GENERATED_NORMALS
+#include "/lib/pbr/generatedNormals.glsl"
 #endif
 
 //Program//
@@ -94,6 +116,10 @@ void main() {
 	vec3 worldPos = ToWorld(viewPos);
 	vec2 lightmap = clamp(lmCoord, 0.0, 1.0);
 
+	#ifdef GENERATED_NORMALS
+	generateNormals(newNormal, albedo.rgb, viewPos, mat);
+	#endif
+
 	if (foliage > 0.5) {
 		newNormal = upVec;
 	}
@@ -101,6 +127,10 @@ void main() {
 	float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
 	float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 	float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
+
+	#if defined GENERATED_EMISSION || defined GENERATED_SPECULAR
+	generateIPBR(albedo, worldPos, viewPos, lightmap, emission, smoothness, metalness, subsurface);
+	#endif
 
 	vec3 shadow = vec3(0.0);
 	gbuffersLighting(albedo, screenPos, viewPos, worldPos, newNormal, shadow, lightmap, NoU, NoL, NoE, subsurface, smoothness, emission, parallaxShadow);
@@ -119,8 +149,17 @@ void main() {
 //Varyings//
 out vec4 color;
 out vec3 eastVec, sunVec, upVec;
+out vec3 normal, binormal, tangent;
 out vec2 texCoord, lmCoord;
 flat out int mat;
+
+#if defined GENERATED_NORMALS || defined PARALLAX || defined SELF_SHADOW || defined PBR
+out float dist;
+flat out vec2 absMidCoordPos;
+out vec2 signMidCoordPos;
+out vec3 viewVector;
+out vec4 vTexCoord, vTexCoordAM;
+#endif
 
 //Uniforms//
 #ifdef TAA
@@ -163,8 +202,27 @@ void main() {
 	lmCoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
 	lmCoord = clamp((lmCoord - 0.03125) * 1.06667, vec2(0.0), vec2(0.9333, 1.0));
 
-	//Normal
+	//Normal, Binormal and Tangent
 	normal = normalize(gl_NormalMatrix * gl_Normal);
+	binormal = normalize(gl_NormalMatrix * cross(at_tangent.xyz, gl_Normal.xyz) * at_tangent.w);
+	tangent = normalize(gl_NormalMatrix * at_tangent.xyz);
+
+	#if defined GENERATED_NORMALS || defined PARALLAX || defined SELF_SHADOW || defined PBR
+	mat3 tbnMatrix = mat3(tangent.x, binormal.x, normal.x,
+						  tangent.y, binormal.y, normal.y,
+						  tangent.z, binormal.z, normal.z);
+	
+	dist = length(gl_ModelViewMatrix * gl_Vertex);
+	viewVector = tbnMatrix * (gl_ModelViewMatrix * gl_Vertex).xyz;
+
+	vec2 midCoord = (gl_TextureMatrix[0] * mc_midTexCoord).st;
+	vec2 texMinMidCoord = texCoord - midCoord;
+	signMidCoordPos = sign(texMinMidCoord);
+	absMidCoordPos = abs(texMinMidCoord);
+	vTexCoordAM.pq = abs(texMinMidCoord) * 2.0;
+	vTexCoordAM.st = min(texCoord, midCoord - texMinMidCoord);
+	vTexCoord.xy = sign(texMinMidCoord) * 0.5 + 0.5;
+	#endif
 
 	//Sun & Other vectors
 	#if defined OVERWORLD || defined END

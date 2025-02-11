@@ -12,7 +12,26 @@ in vec2 texCoord, lmCoord;
 flat in int mat;
 
 //Uniforms//
+#ifdef WATER_CAUSTICS
+uniform float frameTimeCounter;
+
+uniform ivec2 eyeBrightnessSmooth;
+uniform vec3 cameraPosition;
+
+uniform sampler2D noisetex;
+#endif
+
 uniform sampler2D tex;
+
+//Common Variables//
+#ifdef WATER_CAUSTICS
+float eBS = eyeBrightnessSmooth.y / 240.0;
+#endif
+
+//Includes//
+#ifdef WATER_CAUSTICS
+#include "/lib/water/waterCaustics.glsl"
+#endif
 
 //Program//
 void main() {
@@ -26,6 +45,14 @@ void main() {
 	albedo.rgb = mix(vec3(1.0), albedo.rgb, 1.0 - pow(1.0 - albedo.a, 1.5));
 	albedo.rgb *= albedo.rgb;
 	albedo.rgb *= 1.0 - pow32(albedo.a);
+
+	#ifdef WATER_CAUSTICS
+	if (mat == 10001){
+		float caustics = getWaterCaustics(worldPos + cameraPosition);
+        albedo.rgb = mix(vec3(1.0), pow(waterColorSqrt, vec3(0.75)), 0.25 + 0.75 * caustics);
+		albedo.rgb *= 0.25 + caustics * WATER_CAUSTICS_STRENGTH;
+	}
+	#endif
 
 	if (glass > 0.5 && albedo.a < 0.35) discard;
 	#endif

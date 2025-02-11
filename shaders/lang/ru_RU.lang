@@ -133,6 +133,7 @@ option.END_VORTEX_ARMS=Количество Спиральных Ветвей
 
 screen.WATER=Вода
 
+option.VANILLA_WATER=Ванильная Текстура Воды
 option.WATER_FOG=Водный Туман
 option.WATER_FOG_EXPONENT=Плотность Водного Тумана
 option.WATER_CAUSTICS=Каустики
