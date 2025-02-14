@@ -106,8 +106,8 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 
 //Bloom//
 #define BLOOM
-#define BLOOM_STRENGTH 3.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
-#define BLOOM_CONTRAST 6 //[-4 -3 -2 -1 0 1 2 3 4]
+#define BLOOM_STRENGTH 2.50 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
+#define BLOOM_CONTRAST 6 //[-4 -3 -2 -1 0 1 2 3 4 5 6]
 #define BLOOM_TILE_SIZE 1.0 //[0.0 0.5 1.0 1.5 2.0]
 
 //Vanilla AO//
