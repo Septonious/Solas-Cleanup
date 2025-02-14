@@ -78,7 +78,7 @@ uniform mat4 shadowModelView, shadowProjection;
 #ifdef DISTANT_HORIZONS
 uniform float dhFarPlane, dhNearPlane;
 
-uniform sampler2D dhDepthTex1;
+uniform sampler2D dhDepthTex0;
 uniform mat4 dhProjectionInverse;
 #endif
 
@@ -132,7 +132,7 @@ void main() {
 	float z1 = texture2D(depthtex1, texCoord).r;
 
 	#ifdef DISTANT_HORIZONS
-	float dhZ1 = texture2D(dhDepthTex1, texCoord).r;
+	float dhZ = texture2D(dhDepthTex0, texCoord).r;
 	#endif
 
 	vec3 viewPos = ToView(vec3(texCoord, z1));
@@ -241,15 +241,15 @@ void main() {
 	#ifndef DISTANT_HORIZONS
 	if (z1 == 1.0) color = skyColor;
 	#else
-	if (dhZ1 == 1.0 && z1 == 1.0) color = skyColor;
+	if (dhZ == 1.0 && z1 == 1.0) color = skyColor;
 	#endif
 
 	//Fog Calculations
 	#ifdef DISTANT_HORIZONS
 	if (z1 != 1.0) {
 		Fog(color, viewPos, worldPos, atmosphereColor);
-	} else if (dhZ1 != 1.0) {
-		vec4 dhScreenPos = vec4(texCoord, dhZ1, 1.0);
+	} else if (dhZ != 1.0) {
+		vec4 dhScreenPos = vec4(texCoord, dhZ, 1.0);
 		vec4 dhViewPos = dhProjectionInverse * (dhScreenPos * 2.0 - 1.0);
 			 dhViewPos /= dhViewPos.w;
 		

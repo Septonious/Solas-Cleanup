@@ -14,8 +14,9 @@ void getBloom(inout vec3 color, vec2 coord) {
 	vec3 blur2 = getBloomTile(2.0 + BLOOM_TILE_SIZE, coord, vec2(0.50  , 0.0 ) + vec2( 4.5, 0.0) * viewSize);
 	vec3 blur3 = getBloomTile(3.0 + BLOOM_TILE_SIZE, coord, vec2(0.50  , 0.25) + vec2( 4.5, 4.0) * viewSize);
 	vec3 blur4 = getBloomTile(4.0 + BLOOM_TILE_SIZE, coord, vec2(0.625 , 0.25) + vec2( 8.5, 4.0) * viewSize);
+	vec3 blur5 = getBloomTile(5.0 + BLOOM_TILE_SIZE, coord, vec2(0.6875, 0.25) + vec2(12.5, 4.0) * viewSize);
 
-	vec3 blur = (blur1 * 2.46 + blur2 * 2.25 + blur3 * 1.71 + blur4) / 7.42;
+	vec3 blur = (blur1 * 3.58 + blur2 * 3.35 + blur3 * 2.72 + blur4 * 1.87 + blur5) / 12.52;
 	
 	float bloomStrength = BLOOM_STRENGTH;
 

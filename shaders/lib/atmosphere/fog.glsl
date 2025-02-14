@@ -105,7 +105,7 @@ void getNormalFog(inout vec3 color, in vec3 worldPos, in vec3 atmosphereColor, i
     //Mixing Colors
 	#if !defined NETHER && defined DEFERRED
     #if defined DISTANT_HORIZONS && (defined DEFERRED || defined DH_WATER || defined GBUFFERS_WATER)
-    float zMixer = float(texture2D(dhDepthTex1, texCoord).r < 1.0);
+    float zMixer = float(texture2D(dhDepthTex0, texCoord).r < 1.0);
     #else
     float zMixer = float(texture2D(depthtex1, texCoord).r < 1.0);
     #endif

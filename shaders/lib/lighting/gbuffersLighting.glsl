@@ -14,14 +14,13 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
           vanillaDiffuse = mix(1.0, vanillaDiffuse, lightmap.y);
     #endif
 
-
-    //Block Lighting
+    //Vanilla Block Lighting
     float blockLightMap = pow6(lightmap.x * lightmap.x) * 3.0 + max(lightmap.x - 0.05, 0.0);
           blockLightMap *= blockLightMap * 0.5;
 
     vec3 blockLighting = blockLightCol * blockLightMap * (1.0 - min(emission, 1.0));
 
-    //Floodfill lighting
+    //Floodfill Lighting. Works only on Iris
     #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS
     vec3 voxelPos = ToVoxel(worldPos);
 
