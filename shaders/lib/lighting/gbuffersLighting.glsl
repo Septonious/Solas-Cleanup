@@ -190,7 +190,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     #endif
 
     //Vanilla AO
-    #ifdef VANILLA_AO
+    #if defined VANILLA_AO && !defined GBUFFERS_HAND
     float aoMixer = (1.0 - ao) * (1.0 - pow6(lightmap.x));
     albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, aoMixer * AO_STRENGTH);
     #endif
