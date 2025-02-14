@@ -192,7 +192,11 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     //Vanilla AO
     #if defined VANILLA_AO && !defined GBUFFERS_HAND
     float aoMixer = (1.0 - ao) * (1.0 - pow6(lightmap.x));
+    #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS
+          aoMixer *= 1.0 - min(length(voxelLighting), 1.0);
+    #endif
     albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, aoMixer * AO_STRENGTH);
+    albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, min(1.0, aoMixer * aoMixer * AO_STRENGTH));
     #endif
 
     albedo.rgb = pow(albedo.rgb, vec3(2.2));
