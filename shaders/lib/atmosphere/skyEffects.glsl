@@ -187,10 +187,10 @@ void drawAurora(inout vec3 color, in vec3 worldPos, in float VoU, in float caveF
 		float sampleStep = 1.0 / samples;
 		float currentStep = dither * sampleStep;
 
-		float pulse = sin(frameTimeCounter);
+		float pulse = sin(frameTimeCounter * 0.25);
 
 		for (int i = 0; i < samples; i++) {
-			vec3 planeCoord = worldPos * ((14.0 + currentStep * 14.0 - clamp(cameraPosition.y * 0.001, 0.0, 9.0)) / worldPos.y) * 0.025;
+			vec3 planeCoord = worldPos * ((16.0 + currentStep * (12.0 + abs(pulse * 4.0)) - clamp(cameraPosition.y * 0.004, 0.0, 9.0)) / worldPos.y) * 0.025;
 				 planeCoord.xy *= 0.75;
 			vec2 offsetNoiseCoord = planeCoord.xz + cameraPosition.xz * 0.00005;
 				 planeCoord *= 0.5 + texture2D(noisetex, (offsetNoiseCoord + frameTimeCounter * 0.0001) * 0.05).r * 0.5;

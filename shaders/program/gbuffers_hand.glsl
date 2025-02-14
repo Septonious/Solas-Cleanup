@@ -25,6 +25,11 @@ uniform float timeBrightness, timeAngle;
 uniform float shadowFade;
 uniform float wetness;
 
+#ifdef AURORA
+uniform int moonPhase;
+uniform float isSnowy;
+#endif
+
 uniform ivec2 eyeBrightnessSmooth;
 #endif
 

@@ -167,11 +167,10 @@ void main() {
 	vec3 worldPos = ToWorld(viewPos);
 	vec2 lightmap = clamp(lmCoord, 0.0, 1.0);
 
+	//Volumetric Clouds Blending
 	#ifdef VC
 	float cloudDepth = texture2D(gaux1, screenPos.xy).g * (far * 2.0);
-
-	float viewLength = length(viewPos);
-	cloudBlendOpacity = step(viewLength, cloudDepth);
+	cloudBlendOpacity = step(length(viewPos), cloudDepth);
 
 	if (cloudBlendOpacity == 0) {
 		discard;
@@ -251,7 +250,15 @@ void main() {
 		#endif
 	}
 
-	//Atmosphere & Fog
+	//Fog Calculations
+	#ifdef END_NEBULA
+	vec3 empty = vec3(0.0);
+	float nebulaFactor = 0.0;
+	float VoU = dot(nViewPos, upVec);
+	getEndNebula(skyColor, empty, worldPos, VoU, nebulaFactor, 1.0);
+	#endif
+
+	Fog(albedo.rgb, viewPos, worldPos, skyColor);
 	albedo.a *= cloudBlendOpacity;
 
 	/* DRAWBUFFERS:03 */

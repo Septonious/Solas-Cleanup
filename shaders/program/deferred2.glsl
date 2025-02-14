@@ -78,7 +78,7 @@ uniform mat4 shadowModelView, shadowProjection;
 #ifdef DISTANT_HORIZONS
 uniform float dhFarPlane, dhNearPlane;
 
-uniform sampler2D dhDepthTex0;
+uniform sampler2D dhDepthTex1;
 uniform mat4 dhProjectionInverse;
 #endif
 
@@ -124,19 +124,21 @@ float sunVisibility = clamp(dot(sunVec, upVec) + 0.1, 0.0, 0.25) * 4.0;
 #include "/lib/atmosphere/sunMoon.glsl"
 #endif
 
+#include "/lib/atmosphere/fog.glsl"
+
 void main() {
 	vec3 color = texture2D(colortex0, texCoord).rgb;
 
 	float z1 = texture2D(depthtex1, texCoord).r;
 
 	#ifdef DISTANT_HORIZONS
-	float dhZ = texture2D(dhDepthTex0, texCoord).r;
+	float dhZ1 = texture2D(dhDepthTex1, texCoord).r;
 	#endif
 
 	vec3 viewPos = ToView(vec3(texCoord, z1));
 	vec3 worldPos = ToWorld(viewPos);
 
-    //Atmosphere variables
+    //Atmosphere Variables
 	#if defined OVERWORLD
 	vec3 sunPos = vec3(gbufferModelViewInverse * vec4(sunVec * 128.0, 1.0));
 	vec3 sunCoord = sunPos / (sunPos.y + length(sunPos.xz));
@@ -157,7 +159,7 @@ void main() {
 	float VoM = clamp(dot(nViewPos, -sunVec), 0.0, 1.0);
 	#endif
 
-    //Volumetric clouds
+    //Volumetric Clouds
 	vec4 vc = vec4(0.0);
 
 	#ifdef DISTANT_HORIZONS
@@ -175,18 +177,18 @@ void main() {
 	#endif
 	
 	#ifdef VC
-	computeVolumetricClouds(vc, atmosphereColor, z1, blueNoiseDither, cloudDepth);
+	computeVolumetricClouds(vc, skyColor, z1, blueNoiseDither, cloudDepth);
 	#endif
 
 	#ifdef END_CLOUDY_FOG
-	computeEndVolumetricClouds(vc, atmosphereColor, z1, blueNoiseDither, cloudDepth);
+	computeEndVolumetricClouds(vc, skyColor, z1, blueNoiseDither, cloudDepth);
 	#endif
 
-	//Atmosphere calculations
+	//Atmosphere Calculations
 	float nebulaFactor = 0.0;
 
 	#ifdef END_NEBULA
-	getEndNebula(skyColor, skyColorO, worldPos, VoU, nebulaFactor, 1.0);
+	getEndNebula(skyColor, atmosphereColor, worldPos, VoU, nebulaFactor, 1.0);
 	#endif
 
 	vec3 stars = vec3(0.0);
@@ -228,11 +230,6 @@ void main() {
 	#endif
 	#endif
 
-	//Atmosphere & Fog
-	#ifdef OVERWORLD
-	getSunMoon(skyColor, nViewPos, worldPos, lightSun, lightNight, VoS, VoM, VoU, caveFactor);
-	#endif
-
 	skyColor *= 1.0 + (Bayer8(gl_FragCoord.xy) - 0.5) / 64.0;
 
 	#if MC_VERSION >= 11900
@@ -244,7 +241,22 @@ void main() {
 	#ifndef DISTANT_HORIZONS
 	if (z1 == 1.0) color = skyColor;
 	#else
-	if (dhZ == 1.0 && z1 == 1.0) color = skyColor;
+	if (dhZ1 == 1.0 && z1 == 1.0) color = skyColor;
+	#endif
+
+	//Fog Calculations
+	#ifdef DISTANT_HORIZONS
+	if (z1 != 1.0) {
+		Fog(color, viewPos, worldPos, atmosphereColor);
+	} else if (dhZ1 != 1.0) {
+		vec4 dhScreenPos = vec4(texCoord, dhZ1, 1.0);
+		vec4 dhViewPos = dhProjectionInverse * (dhScreenPos * 2.0 - 1.0);
+			 dhViewPos /= dhViewPos.w;
+		
+		Fog(color, dhViewPos.xyz, ToWorld(dhViewPos.xyz), atmosphereColor);
+	}
+	#else
+	Fog(color, viewPos, worldPos, atmosphereColor);
 	#endif
 
 	#if defined VC || defined END_CLOUDY_FOG

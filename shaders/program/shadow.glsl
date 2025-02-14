@@ -77,22 +77,31 @@ out vec4 color;
 #ifdef VX_SUPPORT
 uniform int renderStage;
 
-uniform vec3 cameraPosition;
-
 #extension GL_ARB_shader_image_load_store : enable
 writeonly uniform uimage3D voxel_img;
 #endif
+
+#if defined WAVING_LEAVES || defined WAVING_PLANTS
+uniform float frameTimeCounter;
+#endif
+
+uniform vec3 cameraPosition;
 
 uniform mat4 shadowProjection, shadowProjectionInverse;
 uniform mat4 shadowModelView, shadowModelViewInverse;
 
 //Attributes//
 attribute vec3 at_midBlock;
+attribute vec4 mc_midTexCoord;
 attribute vec4 mc_Entity;
 
 //Includes//
 #ifdef VX_SUPPORT
 #include "/lib/vx/voxelization.glsl"
+#endif
+
+#if defined WAVING_LEAVES || defined WAVING_PLANTS
+#include "/lib/util/waving.glsl"
 #endif
 
 //Program//
@@ -119,6 +128,12 @@ void main() {
 	color = gl_Color;
 
 	vec4 position = shadowModelViewInverse * shadowProjectionInverse * ftransform();
+
+	#if defined WAVING_PLANTS || defined WAVING_LEAVES
+	float istopv = gl_MultiTexCoord0.t < mc_midTexCoord.t ? 1.0 : 0.0;
+	position.xyz = getWavingBlocks(position.xyz, istopv, lmCoord.y);
+	#endif
+
 	worldPos = position.xyz;
 
 	gl_Position = shadowProjection * shadowModelView * position;

@@ -34,7 +34,16 @@ uniform float timeBrightness, timeAngle;
 uniform float shadowFade;
 uniform float wetness;
 
+#ifdef AURORA
+uniform int moonPhase;
+uniform float isSnowy;
+#endif
+
 uniform ivec2 eyeBrightnessSmooth;
+#endif
+
+#ifdef GENERATED_EMISSION
+uniform ivec2 atlasSize;
 #endif
 
 uniform vec3 skyColor;
@@ -43,6 +52,10 @@ uniform vec3 cameraPosition;
 
 uniform sampler2D texture;
 uniform sampler2D noisetex;
+
+#ifdef VC
+uniform sampler2D gaux1;
+#endif
 
 uniform sampler3D floodfillSampler, floodfillSamplerCopy;
 uniform usampler3D voxelSampler;
@@ -73,6 +86,12 @@ vec3 lightVec = sunVec;
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 
+#ifdef OVERWORLD
+#include "/lib/atmosphere/sky.glsl"
+#endif
+
+#include "/lib/atmosphere/fog.glsl"
+
 //Program//
 void main() {
 	vec4 albedoTexture = texture2D(texture, texCoord);
@@ -80,6 +99,7 @@ void main() {
 	vec4 albedo = albedoTexture * color;
 		 albedo.a *= albedo.a;
 	vec3 newNormal = normal;
+	float cloudBlendOpacity = 1.0;
 	float emission = 0.0;
 
 	if (albedo.r < 0.29 && albedo.g < 0.45 && albedo.b > 0.75) discard;
@@ -89,12 +109,57 @@ void main() {
 	vec3 worldPos = ToWorld(viewPos);
 	vec2 lightmap = clamp(lmCoord, 0.0, 1.0);
 
+	//Volumetric Clouds Blending
+	#ifdef VC
+	float cloudDepth = texture2D(gaux1, screenPos.xy).g * (far * 2.0);
+	cloudBlendOpacity = step(length(viewPos), cloudDepth);
+
+	if (cloudBlendOpacity == 0) {
+		discard;
+	}
+	#endif
+
 	float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
 	float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 	float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
 
+	//iPBR Generated Emission
+	#ifdef GENERATED_EMISSION
+	if (atlasSize.x < 900.0) { // We don't want to detect particles from the block atlas
+		float lAlbedo = length(albedo.rgb);
+		vec3 gamePos = worldPos + cameraPosition;
+
+		if (color.a < 1.01 && lAlbedo < 1.0) // Campfire Smoke, World Border
+			albedo.a *= 0.4;
+		else if (albedoTexture.r > 0.99) {
+			emission = max(pow4(albedo.r), 0.1) * pow4(lightmap.x);
+		}
+
+		if (max(abs(albedoTexture.r - albedoTexture.b), abs(albedoTexture.b - albedoTexture.g)) < 0.001) { // Grayscale Particles
+			if (lAlbedo > 0.3 && color.g < 0.5 && color.b > color.r * 1.1 && color.r > 0.3) // Ender Particle, Crying Obsidian Drop
+				emission = max(pow4(albedo.r), 0.1) * 4.0;
+			if (lAlbedo > 0.3 && color.g < 0.5 && color.r > (color.g + color.b) * 3.0) // Redstone Particle
+				lightmap = vec2(0.0), emission = max(pow4(albedo.r), 0.1);
+		}
+	}
+	#endif
+
 	vec3 shadow = vec3(0.0);
 	gbuffersLighting(albedo, screenPos, viewPos, worldPos, newNormal, shadow, lightmap, NoU, NoL, NoE, 0.1, 0.0, emission, 0.0);
+
+	//Fog & Atmosphere Calculations
+	#if defined OVERWORLD
+	vec3 sunPos = vec3(gbufferModelViewInverse * vec4(sunVec * 128.0, 1.0));
+	vec3 sunCoord = sunPos / (sunPos.y + length(sunPos.xz));
+    vec3 atmosphereColor = getAtmosphericScattering(viewPos, normalize(sunCoord));
+	#elif defined NETHER
+	vec3 atmosphereColor = netherColSqrt.rgb * 0.25;
+	#elif defined END
+	vec3 atmosphereColor = endLightCol * 0.1;
+	#endif
+
+	Fog(albedo.rgb, viewPos, worldPos, atmosphereColor);
+	albedo.a *= cloudBlendOpacity;
 
 	/* DRAWBUFFERS:0 */
 	gl_FragData[0] = albedo;
