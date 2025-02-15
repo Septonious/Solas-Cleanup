@@ -242,10 +242,10 @@ void main() {
 
 		#if defined OVERWORLD && !defined DISTANT_HORIZONS
         float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
-		float smoothnessF = 0.6 + length(albedo.rgb) * 0.2 * float(mat == 10000 || water > 0.5);
+		float smoothnessF = 0.75 * float(mat == 10000 || water > 0.5);
 
 		vec3 baseReflectance = vec3(0.1);
-		vec3 specularHighlight = getSpecularHighlight(newNormal, viewPos, smoothnessF, baseReflectance, lightColSqrt, shadow * vanillaDiffuse, color.a);
+		vec3 specularHighlight = getSpecularHighlight(newNormal, viewPos, smoothnessF, baseReflectance, lightColSqrt * (2.0 - sunVisibility), shadow * vanillaDiffuse, color.a);
 		albedo.rgb += specularHighlight;
 		#endif
 	}
