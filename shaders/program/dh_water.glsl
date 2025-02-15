@@ -37,10 +37,6 @@ uniform float isPaleGarden;
 uniform float blindFactor;
 uniform float nightVision;
 
-#ifdef DISTANT_HORIZONS
-uniform float dhFarPlane;
-#endif
-
 #ifdef AURORA
 uniform float isSnowy;
 uniform int moonPhase;
@@ -61,21 +57,14 @@ uniform vec3 cameraPosition;
 uniform sampler2D texture;
 uniform sampler2D noisetex;
 uniform sampler2D depthtex1;
+uniform sampler2D dhDepthTex1;
 
 #ifdef VC
 uniform sampler2D gaux1;
 #endif
 
-#ifdef DISTANT_HORIZONS
-uniform sampler2D dhDepthTex1;
-
-uniform mat4 dhProjectionInverse;
-#endif
-
 #ifdef WATER_REFLECTIONS
 uniform sampler2D gaux3;
-
-uniform mat4 gbufferProjection;
 #endif
 
 uniform mat4 dhProjectionInverse;
@@ -178,11 +167,10 @@ void main() {
 	vec2 lightmap = clamp(lmCoord, 0.0, 1.0);
 
 	float dither = Bayer8(gl_FragCoord.xy);
-
+	float viewLength = length(viewPos);
 	float minDist = (dither - 1.0) * 16.0 + far;
-	if (length(viewPos) < minDist) {
+	if (viewLength < minDist) {
 		discard;
-		return;
 	}
 
 	//Volumetric Clouds Blending
@@ -325,8 +313,8 @@ void main() {
 
 	//Normal, Binormal and Tangent
 	normal = normalize(gl_NormalMatrix * gl_Normal);
-	binormal = normalize(gl_NormalMatrix * cross(at_tangent.xyz, gl_Normal.xyz) * at_tangent.w);
-	tangent = normalize(gl_NormalMatrix * at_tangent.xyz);
+	binormal = normalize(gbufferModelView[2].xyz);
+	tangent = normalize(gbufferModelView[0].xyz);
 
 	#if WATER_NORMALS > 0
 	mat3 tbnMatrix = mat3(tangent.x, binormal.x, normal.x,
@@ -346,7 +334,10 @@ void main() {
 	eastVec = normalize(gbufferModelView[0].xyz);
 
 	//Materials
-	mat = int(mc_Entity.x + 0.5);
+	mat = 0;
+	if (dhMaterialId == DH_BLOCK_WATER) {
+		mat = 10001;
+	}
 
 	//Color & Position
 	vec4 position = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;

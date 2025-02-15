@@ -61,6 +61,13 @@ void computeVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1, f
 		vec3 nViewPos = normalize(viewPos);
 		vec3 nWorldPos = normalize(ToWorld(viewPos));
 
+		#ifdef DISTANT_HORIZONS
+		float dhZ = texture2D(dhDepthTex0, texCoord).r;
+		vec4 dhScreenPos = vec4(texCoord, dhZ, 1.0);
+		vec4 dhViewPos = dhProjectionInverse * (dhScreenPos * 2.0 - 1.0);
+			 dhViewPos /= dhViewPos.w;
+		#endif
+
 		//Cloud parameters
 		float speed = VC_SPEED;
 		float amount = VC_AMOUNT;
@@ -80,8 +87,13 @@ void computeVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1, f
 		float maxDist = max(lowerPlane, upperPlane);
 
 		float planeDifference = maxDist - minDist;
+		#ifdef DISTANT_HORIZONS
+		float rayLength = thickness * 8.0;
+			  rayLength /= nWorldPos.y * nWorldPos.y * 8.0 + 1.0;
+		#else
 		float rayLength = thickness * 5.0;
 			  rayLength /= nWorldPos.y * nWorldPos.y * 5.0 + 1.0;
+		#endif
 		vec3 startPos = cameraPosition + minDist * nWorldPos;
 		vec3 sampleStep = nWorldPos * rayLength;
 		int sampleCount = int(min(planeDifference / rayLength, 16) + dither);
@@ -127,17 +139,12 @@ void computeVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1, f
 			auroraVisibility *= visibilityMultiplier;
 			#endif
 
-			//DH Depth rejection
-			#ifdef DISTANT_HORIZONS
-			float dhZ = texture2D(dhDepthTex0, texCoord).r;
-			#endif
-
 			//Ray marcher
 			for (int i = 0; i < sampleCount; i++, rayPos += sampleStep, sampleTotalLength += rayLength) {
 				if (cloudAlpha > 0.99 || (sampleTotalLength > length(viewPos) && z1 < 1.0)) break;
 
 				#ifdef DISTANT_HORIZONS
-				if ((sampleTotalLength > length(viewPos) && dhZ < 1.0)) break;
+				if ((sampleTotalLength > length(dhViewPos.xyz) && dhZ < 1.0)) break;
 				#endif
 
                 vec3 worldPos = rayPos - cameraPosition;
@@ -250,6 +257,13 @@ void computeEndVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1
 		vec3 nViewPos = normalize(viewPos);
 		vec3 nWorldPos = normalize(ToWorld(viewPos));
 
+		#ifdef DISTANT_HORIZONS
+		float dhZ = texture2D(dhDepthTex0, texCoord).r;
+		vec4 dhScreenPos = vec4(texCoord, dhZ, 1.0);
+		vec4 dhViewPos = dhProjectionInverse * (dhScreenPos * 2.0 - 1.0);
+			 dhViewPos /= dhViewPos.w;
+		#endif
+
 		//Setting the ray marcher
 		float cloudTop = VF_END_HEIGHT + VF_END_THICKNESS * 10.0;
 		float lowerPlane = (VF_END_HEIGHT - cameraPosition.y) / nWorldPos.y;
@@ -288,6 +302,10 @@ void computeEndVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1
 			//Ray marcher
 			for (int i = 0; i < sampleCount; i++, rayPos += sampleStep, sampleTotalLength += rayLength) {
 				if (cloudAlpha > 0.99 || (sampleTotalLength > length(viewPos) && z1 < 1.0)) break;
+
+				#ifdef DISTANT_HORIZONS
+				if ((sampleTotalLength > length(dhViewPos.xyz) && dhZ < 1.0)) break;
+				#endif
 
                 vec3 worldPos = rayPos - cameraPosition;
 

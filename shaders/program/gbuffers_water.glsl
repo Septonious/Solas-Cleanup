@@ -20,6 +20,10 @@ flat in int mat;
 uniform int isEyeInWater;
 uniform int frameCounter;
 
+#ifdef DISTANT_HORIZONS
+uniform float dhFarPlane;
+#endif
+
 uniform float far, near;
 uniform float viewWidth, viewHeight;
 uniform float frameTimeCounter;
@@ -34,10 +38,6 @@ uniform float isPaleGarden;
 
 uniform float blindFactor;
 uniform float nightVision;
-
-#ifdef DISTANT_HORIZONS
-uniform float dhFarPlane;
-#endif
 
 #ifdef AURORA
 uniform float isSnowy;
@@ -65,12 +65,6 @@ uniform sampler2D depthtex1;
 
 #ifdef VC
 uniform sampler2D gaux1;
-#endif
-
-#ifdef DISTANT_HORIZONS
-uniform sampler2D dhDepthTex1;
-
-uniform mat4 dhProjectionInverse;
 #endif
 
 #ifdef WATER_REFLECTIONS

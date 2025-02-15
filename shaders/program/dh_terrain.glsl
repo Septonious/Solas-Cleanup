@@ -17,6 +17,7 @@ flat in int mat;
 uniform int isEyeInWater;
 uniform int frameCounter;
 
+uniform float far, near;
 uniform float viewWidth, viewHeight;
 uniform float blindFactor;
 uniform float nightVision;
@@ -39,7 +40,6 @@ uniform vec3 skyColor;
 uniform vec3 fogColor;
 uniform vec3 cameraPosition;
 
-uniform sampler2D texture;
 uniform sampler2D noisetex;
 
 uniform mat4 dhProjectionInverse;
@@ -80,10 +80,8 @@ vec3 lightVec = sunVec;
 
 //Program//
 void main() {
-	vec4 albedo = texture2D(texture, texCoord);
-	if (albedo.a <= 0.00001) discard;
+	vec4 albedo = color;
 	vec4 albedoP = albedo;
-	albedo *= color;
 
 	vec3 newNormal = normal;
 
@@ -101,6 +99,13 @@ void main() {
 	#endif
 	vec3 worldPos = ToWorld(viewPos);
 	vec2 lightmap = clamp(lmCoord, 0.0, 1.0);
+
+	float dither = Bayer8(gl_FragCoord.xy);
+	float viewLength = length(viewPos);
+	float minDist = (dither - 1.0) * 16.0 + far;
+	if (viewLength < minDist) {
+		discard;
+	}
 
 	if (foliage > 0.5) {
 		newNormal = upVec;
@@ -175,7 +180,7 @@ void main() {
 	eastVec = normalize(gbufferModelView[0].xyz);
 
 	//Materials
-	mat = 0.0;
+	mat = 0;
 
 	//Color & Position
 	vec4 position = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;

@@ -21,7 +21,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     vec3 blockLighting = blockLightCol * blockLightMap * (1.0 - min(emission, 1.0));
 
     //Floodfill Lighting. Works only on Iris
-    #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS
+    #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS && !defined DH_TERRAIN && !defined DH_WATER
     vec3 voxelPos = ToVoxel(worldPos);
 
     float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.5));
@@ -151,6 +151,9 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
         vec3 baseReflectance = vec3(0.1);
 
         float smoothnessF = 0.15 + length(albedo.rgb) * 0.2 + NoL * 0.2;
+        #ifdef DH_TERRAIN
+              smoothnessF += 0.15;
+        #endif
               smoothnessF = mix(smoothnessF, 0.95, smoothness);
               smoothnessF *= float(sss < 0.001);
 
@@ -196,7 +199,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     //Vanilla AO
     #if defined VANILLA_AO && !defined GBUFFERS_HAND
     float aoMixer = (1.0 - ao) * (1.0 - pow6(lightmap.x));
-    #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS
+    #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS && !defined DH_TERRAIN && !defined DH_WATER
           aoMixer *= 1.0 - min(length(voxelLighting), 1.0);
     #endif
     albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, aoMixer * AO_STRENGTH);
