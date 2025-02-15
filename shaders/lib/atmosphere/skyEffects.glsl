@@ -14,7 +14,7 @@ float getNoise(vec2 pos) {
 	return fract(sin(dot(pos, vec2(12.9898, 4.1414))) * 43758.5453);
 }
 
-void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 stars, in float VoU, in float caveFactor, in float nebulaFactor, in float volumetricClouds, float size) {
+void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 stars, in float VoU, in float VoS, in float caveFactor, in float nebulaFactor, in float volumetricClouds, float size) {
 	#ifdef OVERWORLD
 	float visibility = mix(0.5, 0.5 - timeBrightnessSqrt * 0.5, sunVisibility) * (1.0 - wetness) * (1.0 - volumetricClouds) * pow(VoU, 0.5) * caveFactor;
 	#else
@@ -27,12 +27,15 @@ void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 st
 			 planeCoord += cameraPosition.xz * 0.00001;
 			 planeCoord += frameTimeCounter * 0.0001;
 			 planeCoord = floor(planeCoord * 1024.0 * STAR_AMOUNT) / (1024.0 * STAR_AMOUNT);
-			 #ifdef END
-			 vec3 sunVec = mat3(gbufferModelViewInverse) * sunVec;
-			 vec2 sunCoord = sunVec.xz / (sunVec.y + length(sunVec));
-			 vec2 planeCoord2 = worldPos.xz / (length(worldPos) + worldPos.y) - sunCoord;
-			 float spiral1 = getSpiralWarping(planeCoord2) * clamp(VoU, 0.0, 1.0);
-			 planeCoord += spiral1 * 0.000025;
+			 #if defined END && defined END_VORTEX
+			 if (VoS > 0.7) {
+				vec3 sunVec = mat3(gbufferModelViewInverse) * sunVec;
+				vec2 sunCoord = sunVec.xz / (sunVec.y + length(sunVec));
+				vec2 planeCoord2 = worldPos.xz / (length(worldPos) + worldPos.y) - sunCoord;
+				float spiral1 = getSpiralWarping(planeCoord2) * clamp(VoU, 0.0, 1.0);
+				planeCoord += spiral1 * 0.00025;
+				planeCoord *= 0.15;
+			 }
 			 #endif
 
 		float star = getNoise(planeCoord);
