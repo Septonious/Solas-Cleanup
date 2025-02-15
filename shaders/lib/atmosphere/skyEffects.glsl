@@ -18,7 +18,7 @@ void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 st
 	#ifdef OVERWORLD
 	float visibility = mix(0.5, 0.5 - timeBrightnessSqrt * 0.5, sunVisibility) * (1.0 - wetness) * (1.0 - volumetricClouds) * pow(VoU, 0.5) * caveFactor;
 	#else
-	float visibility = 0.4 - nebulaFactor * 0.2;
+	float visibility = (0.4 - nebulaFactor * 0.2) * (1.0 - volumetricClouds);
 	#endif
 
 	if (visibility > 0.0) {
@@ -139,7 +139,7 @@ void getEndVortex(inout vec3 color, in vec3 worldPos, in vec3 stars, in float Vo
 		vec3 accretionDisk = endLightCol * pow7(invDist) * 0.25;
 		vec3 spiral = getSpiral(planeCoord1, VoS);
 
-		color = mix(color, spiral, pow3(length(spiral)));
+		color = mix(color, spiral, length(spiral));
 		color += clamp(ring * hole * accretionDisk, 0.0, 1.0);
 		color *= mix(1.0, 0.0, float(VoS > 0.97) * (1.0 - hole));
 	}

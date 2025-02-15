@@ -272,10 +272,10 @@ void computeEndVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, float z1
 			//Scattering variables
 			float VoU = dot(nViewPos, upVec);
 			float VoL = dot(nViewPos, sunVec);
-			float halfVoLSqrt = VoL * shadowFade * 0.5 + 0.5;
+			float halfVoLSqrt = VoL * 0.5 + 0.5;
 			float halfVoL = halfVoLSqrt * halfVoLSqrt;
 			float scattering = pow6(halfVoLSqrt);
-			float noiseLightFactor = (2.0 - VoL * shadowFade) * 5.0;
+			float noiseLightFactor = (2.0 - VoL) * 5.0;
 
 			vec3 rayPos = startPos + sampleStep * dither;
 			

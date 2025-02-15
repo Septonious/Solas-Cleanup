@@ -124,7 +124,11 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     #endif
 
     shadow *= clamp(NoLm * 1.01 - 0.01, 0.0, 1.0);
+    #ifdef OVERWORLD
     fakeShadow *= pow(NoL, 2.0 - timeBrightness);
+    #else
+    fakeShadow *= NoL;
+    #endif
 
     shadow = mix(fakeShadow, shadow, vec3(shadowLightingFade));
 
@@ -153,7 +157,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
         #ifdef OVERWORLD
         specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF, baseReflectance, lightCol, shadow * vanillaDiffuse, color.a);
         #else
-        specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF, baseReflectance, endLightCol, shadow * vanillaDiffuse, color.a);
+        specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF * 0.75, baseReflectance, endLightCol, shadow * vanillaDiffuse, color.a);
         #endif
 
         specularHighlight = clamp(specularHighlight, vec3(0.0), vec3(3.0));

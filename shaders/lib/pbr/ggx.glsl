@@ -95,7 +95,7 @@ vec3 getSpecularHighlight(vec3 normal, vec3 viewPos, float smoothness, vec3 base
          specular *= shadow * shadowFade * smoothLighting;
          specular *= pow2(1.0 - wetness);
     #else
-    vec3 specular = GGX(normal, normalize(viewPos), smoothness, baseReflectance, 0.25);
+    vec3 specular = GGX(normal, normalize(viewPos), smoothness, baseReflectance, 0.150);
          specular *= shadow * smoothLighting;
     #endif
     

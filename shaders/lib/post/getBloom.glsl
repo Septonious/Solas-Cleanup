@@ -8,7 +8,6 @@ vec3 getBloomTile(float lod, vec2 bloomCoord, vec2 offset) {
 }
 
 void getBloom(inout vec3 color, vec2 coord) {
-	float eBS = eyeBrightnessSmooth.y / 240.0;
 	vec2 viewSize = vec2(1.0 / viewWidth, 1.0 / viewHeight);
 	vec3 blur1 = getBloomTile(1.0 + BLOOM_TILE_SIZE, coord, vec2(0.0   , 0.0 ) + vec2( 0.5, 0.0) * viewSize);
 	vec3 blur2 = getBloomTile(2.0 + BLOOM_TILE_SIZE, coord, vec2(0.50  , 0.0 ) + vec2( 4.5, 0.0) * viewSize);
@@ -21,6 +20,7 @@ void getBloom(inout vec3 color, vec2 coord) {
 	float bloomStrength = BLOOM_STRENGTH;
 
 	#if defined OVERWORLD
+	float eBS = eyeBrightnessSmooth.y / 240.0;
 	bloomStrength *= 1.0 - timeBrightness * 0.33 * eBS;
 	#endif
 
@@ -30,7 +30,7 @@ void getBloom(inout vec3 color, vec2 coord) {
 	vec3 bloomContrast = vec3(exp2(BLOOM_CONTRAST * 0.25));
 	color = pow(color, bloomContrast);
 	blur = pow(blur, bloomContrast);
-	vec3 strengthFactor = pow(vec3(0.2 * bloomStrength), bloomContrast) * (1.5 - eBS * 0.5);
+	vec3 strengthFactor = pow(vec3(0.2 * bloomStrength), bloomContrast);
 	color = mix(color, blur, strengthFactor);
 	color = pow(color, 1.0 / bloomContrast);
 	#endif
