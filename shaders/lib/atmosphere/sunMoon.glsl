@@ -14,7 +14,7 @@ void getSunMoon(inout vec3 color, in vec3 nViewPos, in vec3 worldPos, in vec3 li
 			ang = (ang + (cos(ang * PI) * -0.5 + 0.5 - ang) / 3.0) * TAU;
 			vec3 newSunVec = normalize((gbufferModelView * vec4(vec3(-sin(ang), cos(ang) * sunRotationData) * 2000.0, 1.0)).xyz);
 
-			moon *= clamp(1.0 - pow20(pow32(dot(nViewPos, newSunVec))), 0.0, 1.0);
+			moon *= clamp(1.0 - pow16(pow32(dot(nViewPos, newSunVec))), 0.0, 1.0);
 		}
 
 		vec3 sunColor = sun * normalize(lightSun) * 2.0;
