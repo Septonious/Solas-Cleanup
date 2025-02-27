@@ -254,47 +254,49 @@ void drawPlanarClouds(inout vec3 color, in vec3 atmosphereColor, in vec3 worldPo
          planeCoord.z *= 0.75;
 	vec2 coord = cameraPosition.xz * 0.0001 + planeCoord.xz + frameTimeCounter * 0.001;
 
-    float noise = samplePlanarCloudNoise(coord);
-    float lightingNoise = samplePlanarCloudNoise(coord + normalize(ToWorld(lightVec * 10000.0)).xy * 0.1);
+	if (5.0 > length(planeCoord.xz)) {
+		float noise = samplePlanarCloudNoise(coord);
+		float lightingNoise = samplePlanarCloudNoise(coord + normalize(ToWorld(lightVec * 10000.0)).xy * 0.1);
 
-    //Lighting and coloring
-	#ifdef AURORA
-	float visibilityMultiplier = pow8(1.0 - sunVisibility) * (1.0 - wetness) * caveFactor * AURORA_BRIGHTNESS;
-	float auroraVisibility = 0.0;
+		//Lighting and coloring
+		#ifdef AURORA
+		float visibilityMultiplier = pow8(1.0 - sunVisibility) * (1.0 - wetness) * caveFactor * AURORA_BRIGHTNESS;
+		float auroraVisibility = 0.0;
 
-	#ifdef AURORA_FULL_MOON_VISIBILITY
-	auroraVisibility = mix(auroraVisibility, 1.0, float(moonPhase == 0));
-	#endif
+		#ifdef AURORA_FULL_MOON_VISIBILITY
+		auroraVisibility = mix(auroraVisibility, 1.0, float(moonPhase == 0));
+		#endif
 
-	#ifdef AURORA_COLD_BIOME_VISIBILITY
-	auroraVisibility = mix(auroraVisibility, 1.0, isSnowy);
-	#endif
+		#ifdef AURORA_COLD_BIOME_VISIBILITY
+		auroraVisibility = mix(auroraVisibility, 1.0, isSnowy);
+		#endif
 
-	#ifdef AURORA_ALWAYS_VISIBLE
-	auroraVisibility = 1.0;
-	#endif
+		#ifdef AURORA_ALWAYS_VISIBLE
+		auroraVisibility = 1.0;
+		#endif
 
-	auroraVisibility *= visibilityMultiplier;
-	#endif
+		auroraVisibility *= visibilityMultiplier;
+		#endif
 
-	pc = noise * VoU * pow(length(planeCoord.y), 0.125) * (1.0 - wetness) * (1.0 - volumetricClouds) * caveFactor;
+		pc = noise * VoU * pow(length(planeCoord.y), 0.125) * (1.0 - wetness) * (1.0 - volumetricClouds) * caveFactor;
 
-    float noiseDifference = noise - lightingNoise;
-    float morningEveningFactor = mix(1.0, 0.66, sqrt(sunVisibility) * (1.0 - timeBrightnessSqrt));
-	float cloudLighting = min(mix(noise * noise, lightingNoise, 0.25), 1.0);
+		float noiseDifference = noise - lightingNoise;
+		float morningEveningFactor = mix(1.0, 0.66, sqrt(sunVisibility) * (1.0 - timeBrightnessSqrt));
+		float cloudLighting = min(mix(noise * noise, lightingNoise, 0.25), 1.0);
 
-	vec3 cloudAmbientColor = mix(ambientCol, atmosphereColor * atmosphereColor, 0.5 * sunVisibility);
-         cloudAmbientColor *= 0.25 + sunVisibility * sunVisibility * (0.2 - wetness * 0.2);
-	vec3 cloudLightColor = mix(lightCol, mix(lightCol, atmosphereColor, 0.5 * sunVisibility) * atmosphereColor * 2.0, sunVisibility * (1.0 - timeBrightness * 0.33));
-         cloudLightColor *= morningEveningFactor * (2.0 + pow8(VoL) * 4.0);
+		vec3 cloudAmbientColor = mix(ambientCol, atmosphereColor * atmosphereColor, 0.5 * sunVisibility);
+			cloudAmbientColor *= 0.25 + sunVisibility * sunVisibility * (0.2 - wetness * 0.2);
+		vec3 cloudLightColor = mix(lightCol, mix(lightCol, atmosphereColor, 0.5 * sunVisibility) * atmosphereColor * 2.0, sunVisibility * (1.0 - timeBrightness * 0.33));
+			cloudLightColor *= morningEveningFactor * (2.0 + pow8(VoL) * 4.0);
 
-    vec3 cloudColor = mix(cloudLightColor, cloudAmbientColor, cloudLighting);
-         cloudColor = pow(cloudColor, vec3(1.0 / 2.2));
-		 #ifdef AURORA
-		 cloudColor = mix(cloudColor, vec3(0.4, 2.5, 0.9) * auroraVisibility, auroraVisibility * 0.05);
-		 #endif
+		vec3 cloudColor = mix(cloudLightColor, cloudAmbientColor, cloudLighting);
+			cloudColor = pow(cloudColor, vec3(1.0 / 2.2));
+			#ifdef AURORA
+			cloudColor = mix(cloudColor, vec3(0.4, 2.5, 0.9) * auroraVisibility, auroraVisibility * 0.05);
+			#endif
 
-    color = mix(color, cloudColor * PLANAR_CLOUDS_BRIGHTNESS, pc * PLANAR_CLOUDS_OPACITY);
+		color = mix(color, cloudColor * PLANAR_CLOUDS_BRIGHTNESS, pc * PLANAR_CLOUDS_OPACITY);
+	}
 }
 #endif
 

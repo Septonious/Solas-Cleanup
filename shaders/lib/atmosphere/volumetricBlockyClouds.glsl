@@ -122,7 +122,7 @@ void computeVolumetricClouds(inout vec4 vc, in vec3 atmosphereColor, in float z1
 
 				//Lighting calculations
 				cloudLighting = clamp(smoothstep(VC_HEIGHT + stretching * noise, VC_HEIGHT - stretching * noise, rayPos.y), 0.0, 1.0);
-				cloudLighting = mix(cloudLighting, 1.0, noiseL - noise * 0.5);
+				cloudLighting = mix(cloudLighting, 1.0, (noiseL - noise * 0.5) * shadowFade);
 			}
 			vec3 cloudColor = mix(cloudLightCol, cloudAmbientCol, cloudLighting);
 				 #ifdef AURORA
