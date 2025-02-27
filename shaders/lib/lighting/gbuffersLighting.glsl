@@ -62,12 +62,12 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     //Subsurface Scattering
     float sss = 0.0;
 
-    if (shadowLightingFade > 0.0) {
+    if (0 < shadowLightingFade) {
         #if defined OVERWORLD && defined GBUFFERS_TERRAIN
-        if (subsurface > 0.0 && lightmap.y > 0.0) {
+        if (0 < subsurface && 0 < lightmap.y) {
             float VoL = clamp(dot(normalize(viewPos), lightVec), 0.0, 1.0);
             sss = pow8(VoL) * shadowFade * (1.0 - wetness * 0.5);
-            if (subsurface > 0.49 && subsurface < 0.51) { //Leaves
+            if (0.49 < subsurface && subsurface < 0.51) { //Leaves
                 NoLm += 0.5 * shadowLightingFade * (0.75 + sss * 0.75);
             } else { //Foliage
                 NoLm += shadowLightingFade * (0.35 + sss) * (1.0 - float(subsurface > 0.29 && subsurface < 0.31) * 0.5);
@@ -201,6 +201,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     float aoMixer = (1.0 - ao) * (1.0 - pow6(lightmap.x));
     #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS && !defined DH_TERRAIN && !defined DH_WATER
           aoMixer *= 1.0 - min(length(voxelLighting), 1.0);
+          aoMixer *= 1.0 - clamp(NoL, 0.0, 1.0) * 0.5;
     #endif
     albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, aoMixer * AO_STRENGTH);
     albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, min(1.0, aoMixer * aoMixer * AO_STRENGTH));

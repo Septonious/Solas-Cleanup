@@ -21,14 +21,14 @@ void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 st
 	float visibility = (0.4 - nebulaFactor * 0.2) * (1.0 - volumetricClouds);
 	#endif
 
-	if (visibility > 0.0) {
+	if (0 < visibility) {
 		vec2 planeCoord = worldPos.xz / (length(worldPos.y) + length(worldPos.xz));
 			 planeCoord *= size;
 			 planeCoord += cameraPosition.xz * 0.00001;
 			 planeCoord += frameTimeCounter * 0.0001;
 			 planeCoord = floor(planeCoord * 1024.0 * STAR_AMOUNT) / (1024.0 * STAR_AMOUNT);
 			 #if defined END && defined END_VORTEX
-			 if (VoS > 0.7) {
+			 if (0.7 < VoS) {
 				vec3 sunVec = mat3(gbufferModelViewInverse) * sunVec;
 				vec2 sunCoord = sunVec.xz / (sunVec.y + length(sunVec));
 				vec2 planeCoord2 = worldPos.xz / (length(worldPos) + worldPos.y) - sunCoord;
@@ -61,7 +61,7 @@ void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 st
 void drawMilkyWay(inout vec3 color, in vec3 worldPos, in float VoU, in float caveFactor, inout float nebulaFactor, in float volumetricClouds) {
 	float visibility = (1.0 - timeBrightnessSqrt) * (1.0 - wetness) * (1.0 - volumetricClouds) * sqrt(max(VoU, 0.0)) * MILKY_WAY_BRIGHTNESS * caveFactor;
 
-	if (visibility > 0.0) {
+	if (0 < visibility) {
 		vec2 planeCoord = worldPos.zx / (worldPos.y + length(worldPos.zyx));
 			 planeCoord += frameTimeCounter * 0.0001;
 			 planeCoord *= 0.8;
@@ -78,7 +78,7 @@ void drawMilkyWay(inout vec3 color, in vec3 worldPos, in float VoU, in float cav
 void getEndNebula(inout vec3 color, inout vec3 color2, in vec3 worldPos, in float VoU, inout float nebulaFactor, in float caveFactor) {
 	float visibility = pow(1.0 - abs(VoU), 1.5) * END_NEBULA_BRIGHTNESS;
 
-	if (visibility > 0.0) {
+	if (0 < visibility) {
 		vec3 sunVec = mat3(gbufferModelViewInverse) * sunVec;
 		vec2 sunCoord = sunVec.xz / (sunVec.y + length(sunVec));
 		vec2 planeCoord1 = worldPos.xz / (length(worldPos) + worldPos.y) - sunCoord;
@@ -123,7 +123,7 @@ vec3 getSpiral(vec2 coord, float hole) {
 }
 
 void getEndVortex(inout vec3 color, in vec3 worldPos, in vec3 stars, in float VoU, in float VoS) {
-	if (VoS > 0.5) {
+	if (0.5 < VoS) {
 		vec3 sunVec = mat3(gbufferModelViewInverse) * sunVec;
 		vec2 sunCoord = sunVec.xz / (sunVec.y + length(sunVec));
 		vec2 planeCoord0 = worldPos.xz / (worldPos.y + length(worldPos)) + sunCoord;
@@ -144,7 +144,7 @@ void getEndVortex(inout vec3 color, in vec3 worldPos, in vec3 stars, in float Vo
 
 		color = mix(color, spiral, length(spiral));
 		color += clamp(ring * hole * accretionDisk, 0.0, 1.0);
-		color *= mix(1.0, 0.0, float(VoS > 0.97) * (1.0 - hole));
+		color *= mix(1.0, 0.0, float(0.97 < VoS) * (1.0 - hole));
 	}
 }
 #endif
@@ -177,7 +177,7 @@ void drawAurora(inout vec3 color, in vec3 worldPos, in float VoU, in float caveF
 
 	visibility *= visibilityMultiplier;
 
-	if (visibility > 0.0) {
+	if (0 < visibility) {
 		vec3 aurora = vec3(0.0);
 
         float dither = Bayer8(gl_FragCoord.xy);
@@ -202,7 +202,7 @@ void drawAurora(inout vec3 color, in vec3 worldPos, in float VoU, in float caveF
 			float noise = getAuroraNoise(coord + frameTimeCounter * 0.0008);
 			float noiseBase = noise;
 			
-			if (noise > 0.0) {
+			if (0 < noise) {
 				float auroraDistanceFactor = max(1.0 - length(planeCoord.xz) * 0.25, 0.0);
 
 				noise *= texture2D(noisetex, coord * 0.125 + frameTimeCounter * 0.0008).b * (0.4 - pulse * 0.1) + (0.6 + pulse * 0.1);
@@ -302,7 +302,7 @@ void drawPlanarClouds(inout vec3 color, in vec3 atmosphereColor, in vec3 worldPo
 void getRainbow(inout vec3 color, in vec3 worldPos, in float VoU, in float size, in float radius, in float caveFactor) {
 	float visibility = pow3(sunVisibility) * (1.0 - rainStrength) * (1.0 - isSnowy) * wetness * max(VoU, 0.0) * caveFactor * RAINBOW_BRIGHTNESS;
 
-	if (visibility > 0.0) {
+	if (0 < visibility) {
 		vec2 planeCoord = worldPos.xy / (worldPos.y + length(worldPos.xz) * 0.65);
 		vec2 rainbowCoord = vec2(planeCoord.x + 2.5, planeCoord.y);
 

@@ -1,13 +1,13 @@
 void getSunMoon(inout vec3 color, in vec3 nViewPos, in vec3 worldPos, in vec3 lightSun, in vec3 lightNight, in float VoS, in float VoM, in float VoU, in float caveFactor) {
 	float visibility = (1.0 - wetness) * caveFactor;
 
-	if (visibility > 0.0) {
+	if (0 < visibility) {
 		float sun = pow16(pow32(VoS * VoS));
 		float moon = pow32(pow32(VoM));
 		float glare = pow24(VoS + VoM);
 
-		if (moon > 0.0 && moonPhase > 0) { // Moon phases, uses the same method as Complementary v4
-			float phaseFactor = int(moonPhase != 4) * (1.0 - int(moonPhase > 4) * 2.0) * 0.00175;
+		if (0 < moon && 0 < moonPhase) { // Moon phases, uses the same method as Complementary v4
+			float phaseFactor = int(moonPhase != 4) * (1.0 - int(4 < moonPhase) * 2.0) * 0.00175;
 
 			const vec2 sunRotationData = vec2(cos(sunPathRotation * 0.01745329251994), -sin(sunPathRotation * 0.01745329251994));
 			float ang = fract(timeAngle - (0.25 + phaseFactor));

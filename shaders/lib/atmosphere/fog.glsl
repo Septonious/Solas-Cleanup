@@ -62,7 +62,7 @@ void getNormalFog(inout vec3 color, in vec3 worldPos, in vec3 atmosphereColor, i
     float fog = 1.0 - exp(-(0.0075 + wetness * caveFactor * 0.0025) * lViewPos * fogDistance);
 		  fog = clamp(fog * fogDensity * fogAltitude, 0.0, 1.0);
 
-	vec3 fogCol = mix(caveMinLightCol * atmosphereColor, atmosphereColor, caveFactor);
+	vec3 fogCol = mix(caveMinLightCol * atmosphereColor, mix(atmosphereColor, ambientCol, 0.4), caveFactor);
 
 	//Distant Fade
 	#ifdef DISTANT_FADE
@@ -82,11 +82,11 @@ void getNormalFog(inout vec3 color, in vec3 worldPos, in vec3 atmosphereColor, i
 		float vanillaFog = 1.0 - (farPlane - (fogFactor + fogOffset)) * 8.0 / (4.0 * farPlane);
 			  vanillaFog = clamp(vanillaFog * vanillaFog * vanillaFog, 0.0, 1.0) * caveFactor;
 	
-		if (vanillaFog > 0.0){
+		if (0.0 < vanillaFog){
 			fogCol *= fog;
 			fog = mix(fog, 1.0, vanillaFog);
 
-			if (fog > 0.0) fogCol = mix(fogCol, atmosphereColor, vanillaFog) / fog;
+			if (0.0 < fog) fogCol = mix(fogCol, atmosphereColor, vanillaFog) / fog;
 		}
 	}
 	#endif
@@ -131,12 +131,12 @@ void Fog(inout vec3 color, in vec3 viewPos, in vec3 worldPos, in vec3 atmosphere
 		#ifndef END
         getNormalFog(color, worldPos, atmosphereColor, lViewPos, lWorldPos);
 		#endif
-    } else if (isEyeInWater > 1) {
+    } else if (1 < isEyeInWater) {
         getDenseFog(color, lViewPos);
     }
-	if (blindFactor > 0) getBlindFog(color, lViewPos);
+	if (0 < blindFactor) getBlindFog(color, lViewPos);
 
 	#if MC_VERSION >= 11900
-	if (darknessFactor > 0) getDarknessFog(color, lViewPos);
+	if (0 < darknessFactor) getDarknessFog(color, lViewPos);
 	#endif
 }

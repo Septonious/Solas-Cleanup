@@ -4,7 +4,7 @@ float getNoHSquared(float radiusTan, float NoL, float NoV, float VoL) {
     float radiusCos = 1.0 / sqrt(1.0 + radiusTan * radiusTan);
     
     float RoL = 2.0 * NoL * NoV - VoL;
-    if (RoL >= radiusCos) return 1.0;
+    if (radiusCos <= RoL) return 1.0;
 
     float rOverLengthT = radiusCos * radiusTan / sqrt(1.0 - RoL * RoL);
     float NoTr = rOverLengthT * (NoV - RoL * NoL);

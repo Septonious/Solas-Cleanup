@@ -75,7 +75,7 @@ void main() {
 	gbuffersLighting(albedo, screenPos, viewPos, worldPos, newNormal, shadow, lightmap, NoU, NoL, NoE, 0.0, 0.0, 0.0, 0.0);
 
 	/* DRAWBUFFERS:0 */
-	gl_FragData[0] = albedo;
+	gl_FragData[0] = vec4(albedo.rgb, 1.0);
 }
 
 #endif
