@@ -196,20 +196,22 @@ void main() {
 
 	#ifdef OVERWORLD
 	if (VoU > 0.0) {
-		#ifdef MILKY_WAY
-		drawMilkyWay(skyColor, worldPos, VoU, caveFactor, nebulaFactor, vc.a * 2.0);
-		#endif
-
-		#ifdef AURORA
-		drawAurora(skyColor, worldPos, VoU, caveFactor, vc.a);
-		#endif
-
 		#ifdef PLANAR_CLOUDS
 		drawPlanarClouds(skyColor, atmosphereColor, worldPos, viewPos, VoU, caveFactor, vc.a, pc);
 		#endif
 
+		float cloudBlockFactor = min(vc.a + pow(pc, 0.33), 1.0);
+
+		#ifdef MILKY_WAY
+		drawMilkyWay(skyColor, worldPos, VoU, caveFactor, nebulaFactor, cloudBlockFactor);
+		#endif
+
+		#ifdef AURORA
+		drawAurora(skyColor, worldPos, VoU, caveFactor, cloudBlockFactor);
+		#endif
+
 		#ifdef STARS
-		drawStars(skyColor, worldPos, sunVec, stars, VoU, VoS, caveFactor, nebulaFactor, min(vc.a * 2.0 + pow(pc, 0.25), 1.0), 0.5);
+		drawStars(skyColor, worldPos, sunVec, stars, VoU, VoS, caveFactor, nebulaFactor, cloudBlockFactor, 0.5);
 		#endif
 
 		#ifdef RAINBOW
