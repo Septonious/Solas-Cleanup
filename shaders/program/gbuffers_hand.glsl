@@ -15,6 +15,10 @@ in vec2 texCoord, lmCoord;
 uniform int isEyeInWater;
 uniform int frameCounter;
 
+#ifdef VC_SHADOWS
+uniform int worldDay, worldTime;
+#endif
+
 uniform float viewWidth, viewHeight;
 uniform float blindFactor;
 uniform float nightVision;

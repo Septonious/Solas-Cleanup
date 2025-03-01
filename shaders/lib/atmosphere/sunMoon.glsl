@@ -1,5 +1,5 @@
 void getSunMoon(inout vec3 color, in vec3 nViewPos, in vec3 worldPos, in vec3 lightSun, in vec3 lightNight, in float VoS, in float VoM, in float VoU, in float caveFactor) {
-	float visibility = (1.0 - wetness) * caveFactor;
+	float visibility = (1.0 - wetness * 0.6) * caveFactor;
 
 	if (0 < visibility) {
 		float sun = pow16(pow32(VoS * VoS));

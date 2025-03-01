@@ -1,3 +1,29 @@
+#ifdef VC_SHADOWS
+void getDynamicWeather(inout float speed, inout float amount, inout float frequency, inout float density, inout float height) {
+    int worldDayInterpolated = int((worldDay * 24000 + worldTime) / 24000);
+	float dayAmountFactor = abs(worldDayInterpolated % 7 / 2 - 0.5) * 0.5;
+	float dayDensityFactor = abs(worldDayInterpolated % 9 / 4 - worldDayInterpolated % 2);
+	float dayFrequencyFactor = 1.0 + abs(worldDayInterpolated % 6 / 4 - worldDayInterpolated % 2) * 0.65;
+
+	amount = mix(amount, 11.5, wetness) - dayAmountFactor;
+	density += dayDensityFactor;
+	frequency *= dayFrequencyFactor;
+}
+
+void getCloudShadow(vec2 rayPos, vec2 wind, float amount, float frequency, float density, inout float noise) {
+	rayPos *= 0.000125 * frequency;
+
+	float noiseBase = texture2D(noisetex, rayPos + 0.5 + wind * 0.5).g;
+		  noiseBase = pow2(1.0 - noiseBase) * 0.5 + 0.4 - wetness * 0.025;
+	
+	noise = noiseBase * 22.0;
+	noise = max(noise - amount, 0.0) * (density * 0.25);
+	noise /= sqrt(noise * noise + 0.25);
+	noise = clamp(noise, 0.0, 1.0);
+	noise = exp(noise * -5.0);
+}
+#endif
+
 void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in vec3 worldPos, in vec3 normal, inout vec3 shadow, in vec2 lightmap, 
                     in float NoU, in float NoL, in float NoE,
                     in float subsurface, in float smoothness, in float emission, in float parallaxShadow) {
@@ -24,7 +50,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS && !defined DH_TERRAIN && !defined DH_WATER
     vec3 voxelPos = ToVoxel(worldPos);
 
-    float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.7));
+    float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.6));
           floodfillFade = clamp(floodfillFade, 0.0, 1.0);
 
     vec3 voxelLighting = vec3(0.0);
@@ -56,7 +82,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     //Some code made by Emin and gri573
     float shadowLightingFade = maxOf(abs(worldPos) / (vec3(shadowDistance, shadowDistance + 64.0, shadowDistance)));
           shadowLightingFade = clamp(shadowLightingFade, 0.0, 1.0);
-          shadowLightingFade = 1.0 - shadowLightingFade * shadowLightingFade;
+          shadowLightingFade = 1.0 - pow3(shadowLightingFade);
 
     //Subsurface Scattering
     float sss = 0.0;
@@ -131,6 +157,26 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
 
     shadow = mix(fakeShadow, shadow, vec3(shadowLightingFade));
 
+    #ifdef VC_SHADOWS
+    //Cloud Shadows
+    float speed = VC_SPEED;
+    float amount = VC_AMOUNT;
+    float frequency = VC_FREQUENCY;
+    float density = VC_DENSITY;
+    float height = VC_HEIGHT;
+
+    getDynamicWeather(speed, amount, frequency, density, height);
+
+    vec2 wind = vec2(frameTimeCounter * speed * 0.005, sin(frameTimeCounter * speed * 0.1) * 0.01) * speed * 0.1;
+    vec3 worldSunVec = mat3(gbufferModelViewInverse) * lightVec;
+    vec3 cloudShadowPos = worldPos + cameraPosition + (worldSunVec / max(abs(worldSunVec.y), 0.0)) * max((VC_HEIGHT + VC_THICKNESS + 25.0) - worldPos.y - cameraPosition.y, 0.0);
+
+    float noise = 0.0;
+    getCloudShadow(cloudShadowPos.xz, wind, amount, frequency, density, noise);
+
+    shadow = mix(vec3(0.0), shadow, vec3(noise) * VC_OPACITY);
+    #endif
+
     //Main Lighting
     #ifdef OVERWORLD
     float rainFactor = 1.0 - wetness * 0.75;
@@ -166,7 +212,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
         specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF, baseReflectance, endLightCol, shadow * vanillaDiffuse, color.a);
         #endif
 
-        specularHighlight = clamp(specularHighlight * 8.0, vec3(0.0), vec3(8.0));
+        specularHighlight = clamp(specularHighlight * 4.0, vec3(0.0), vec3(8.0));
     }
     #endif
 

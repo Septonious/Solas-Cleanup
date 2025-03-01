@@ -1,9 +1,9 @@
-float getCloudNoise(vec2 pos) {
+float getCloudNoise(vec2 rayPos) {
 	const float roundness = 0.2;
-	pos = pos * 0.05 + 0.5;
-	vec2 a, b = modf(1.0 + abs(pos), a);
+	rayPos = rayPos * 0.05 + 0.5;
+	vec2 a, b = modf(1.0 + abs(rayPos), a);
 	b = smoothstep(0.5 - roundness, roundness + 0.5, b);
-	vec2 noiseCoord = sign(pos) * (a + b - 0.5) / 256.0;
+	vec2 noiseCoord = sign(rayPos) * (a + b - 0.5) / 256.0;
 	
 	return float(0 < texture2D(shadowcolor1, noiseCoord).r);
 }

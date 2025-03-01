@@ -20,6 +20,10 @@ flat in int mat;
 uniform int isEyeInWater;
 uniform int frameCounter;
 
+#ifdef VC_SHADOWS
+uniform int worldDay, worldTime;
+#endif
+
 #ifdef DISTANT_HORIZONS
 uniform float dhFarPlane;
 #endif
