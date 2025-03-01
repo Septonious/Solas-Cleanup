@@ -24,7 +24,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS && !defined DH_TERRAIN && !defined DH_WATER
     vec3 voxelPos = ToVoxel(worldPos);
 
-    float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.5));
+    float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.7));
           floodfillFade = clamp(floodfillFade, 0.0, 1.0);
 
     vec3 voxelLighting = vec3(0.0);
@@ -41,7 +41,6 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
             lighting = texture3D(floodfillSampler, voxelSamplePos).rgb;
         }
         voxelLighting = pow(lighting, vec3(1.0 / FLOODFILL_RADIUS));
-        voxelLighting *= 0.5 + 0.5 * length(voxelLighting);
 
         #ifdef GBUFFERS_ENTITIES
         voxelLighting += pow16(lightmap.x) * blockLightCol;
@@ -125,7 +124,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
 
     shadow *= clamp(NoLm * 1.01 - 0.01, 0.0, 1.0);
     #ifdef OVERWORLD
-    fakeShadow *= pow(NoL, 2.0 - timeBrightness);
+    fakeShadow *= clamp(NoL * 1.01 - 0.01, 0.0, 1.0);
     #else
     fakeShadow *= NoL;
     #endif
@@ -155,15 +154,19 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
               smoothnessF += 0.15;
         #endif
               smoothnessF = mix(smoothnessF, 0.95, smoothness);
-              smoothnessF *= float(sss < 0.001);
+        #ifndef GBUFFERS_TERRAIN
+              smoothnessF *= float(subsurface < 0.001);
+        #else
+              smoothnessF *= float(subsurface < 0.001 && mat != 10314);
+        #endif
 
         #ifdef OVERWORLD
         specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF, baseReflectance, lightCol, shadow * vanillaDiffuse, color.a);
         #else
-        specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF * 0.75, baseReflectance, endLightCol, shadow * vanillaDiffuse, color.a);
+        specularHighlight = getSpecularHighlight(normal, viewPos, smoothnessF, baseReflectance, endLightCol, shadow * vanillaDiffuse, color.a);
         #endif
 
-        specularHighlight = clamp(specularHighlight, vec3(0.0), vec3(3.0));
+        specularHighlight = clamp(specularHighlight * 8.0, vec3(0.0), vec3(8.0));
     }
     #endif
 
@@ -208,7 +211,6 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     #endif
 
     albedo.rgb = pow(albedo.rgb, vec3(2.2));
-    albedo.rgb *= sceneLighting * vanillaDiffuse + blockLighting + emission;
-    albedo.rgb += specularHighlight;
+    albedo.rgb *= sceneLighting * vanillaDiffuse + blockLighting + emission + specularHighlight;
     albedo.rgb = pow(albedo.rgb, vec3(1.0 / 2.2));
 }
