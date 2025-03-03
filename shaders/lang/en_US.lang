@@ -250,7 +250,7 @@ option.NORMAL_THRESHOLD=Generation Threshold
 screen.PBR=Resourcepack PBR
 
 option.PBR=Resourcepack PBR
-option.PBR.comment=Enables the use of specular and normal mapping which allows for more detail on various things.  §e[*]§rThis option requires a resource pack which contains specular and/or normal maps, disable if none is currently used. §e[*]§rOptions which requires advanced materials are indicated by *, changing these options won't affect the visuals or performance while advanced materials is disabled.
+option.PBR.comment=Enables the use of specular and normal mapping which allows for more detail on various things. §e[*]§rThis option requires a resource pack which contains specular and/or normal maps, disable if none is currently used. §e[*]§rOptions which requires advanced materials are indicated by *, changing these options won't affect the visuals or performance while advanced materials is disabled.
 option.MATERIAL_FORMAT=Material Format*
 option.MATERIAL_FORMAT.comment=Determines the specular and normal map format used by the resource pack. §e[*]§rTexture artists usually tell which format is used in their resource pack, using the wrong format may give weird results.
 value.MATERIAL_FORMAT.0=SEUS/Old PBR
@@ -450,7 +450,7 @@ option.ET_I=Intensity
 
 #=======================================================# POST #=======================================================#
 
-screen.POST=Post Effects
+screen.POST=Cinematic Effects & Post Processing
 
 option.SHARPENING=Image Sharpening
 option.CHROMATIC_ABERRATION=Chromatic Aberration (CA)

@@ -1,9 +1,9 @@
-void getSunMoon(inout vec3 color, in vec3 nViewPos, in vec3 worldPos, in vec3 lightSun, in vec3 lightNight, in float VoS, in float VoM, in float VoU, in float caveFactor) {
+void getSunMoon(inout vec3 color, in vec3 nViewPos, in vec3 worldPos, in vec3 lightSun, in vec3 lightNight, in float VoS, in float VoM, in float VoU, in float caveFactor, in float cloudFactor) {
 	float visibility = (1.0 - wetness * 0.6) * caveFactor;
 
 	if (0 < visibility) {
-		float sun = pow16(pow32(VoS * VoS));
-		float moon = pow32(pow32(VoM));
+		float sun = pow16(pow32(VoS * VoS)) * cloudFactor;
+		float moon = pow32(pow32(VoM)) * cloudFactor;
 		float glare = pow24(VoS + VoM);
 
 		if (0 < moon && 0 < moonPhase) { // Moon phases, uses the same method as Complementary v4

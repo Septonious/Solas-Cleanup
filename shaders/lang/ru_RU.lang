@@ -248,7 +248,7 @@ option.NORMAL_THRESHOLD=Порог Генерации
 screen.PBR=Сторонний PBR
 
 option.PBR=Сторонний PBR
-option.PBR.comment=Enables the use of specular and normal mapping which allows for more detail on various things.  §e[*]§rThis option requires a resource pack which contains specular and/or normal maps, disable if none is currently used. §e[*]§rOptions which requires advanced materials are indicated by *, changing these options won't affect the visuals or performance while advanced materials is disabled.
+option.PBR.comment=Enables the use of specular and normal mapping which allows for more detail on various things. §e[*]§rThis option requires a resource pack which contains specular and/or normal maps, disable if none is currently used. §e[*]§rOptions which requires advanced materials are indicated by *, changing these options won't affect the visuals or performance while advanced materials is disabled.
 option.MATERIAL_FORMAT=Формат Ресурспака*
 option.MATERIAL_FORMAT.comment=Determines the specular and normal map format used by the resource pack. §e[*]§rTexture artists usually tell which format is used in their resource pack, using the wrong format may give weird results.
 value.MATERIAL_FORMAT.0=SEUS/Old PBR

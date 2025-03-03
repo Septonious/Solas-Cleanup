@@ -219,7 +219,7 @@ void main() {
 		#endif
 	}
 
-	getSunMoon(skyColor, nViewPos, worldPos, lightSun, lightNight, VoS, VoM, VoU, caveFactor * (1.0 - pow(vc.a, 0.25)) * (1.0 - pow(pc, 0.125)));
+	getSunMoon(skyColor, nViewPos, worldPos, lightSun, lightNight, VoS, VoM, VoU, caveFactor, (1.0 - pow(vc.a, 0.25)) * (1.0 - pow(pc, 0.125)));
 	#endif
 
 	#ifdef END
