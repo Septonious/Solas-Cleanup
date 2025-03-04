@@ -57,7 +57,7 @@ vec3 getAtmosphericScattering(vec3 viewPos, vec3 lightPos) {
          daySky = jodieReinhardTonemap(daySky * PI);
          daySky = pow(daySky, vec3(2.2));
          daySky = mix(daySky, lightColSqrt, sunScatteringMixer);
-    vec3 nightSky = lightNight * 0.65;
+    vec3 nightSky = lightNight * 0.6;
          //Tint the atmosphere with slight green when aurora is visible
          #ifdef AURORA
          float visibilityMultiplier = pow8(1.0 - sunVisibility) * (1.0 - wetness) * AURORA_BRIGHTNESS;

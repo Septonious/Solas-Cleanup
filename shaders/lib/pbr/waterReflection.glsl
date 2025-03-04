@@ -15,7 +15,7 @@ void getReflection(inout vec4 albedo, in vec3 viewPos, in vec3 nViewPos, in vec3
 	border = clamp(13.333 * (1.0 - border), 0.0, 1.0);
 
 	vec4 reflection = texture2D(gaux3, reflectPos.xy);
-	     reflection.rgb = pow8(reflection.rgb * 2.0);
+	     reflection.rgb = pow8(reflection.rgb) * 256.0;
          reflection.rgb *= float(reflection.a > 0.0);
 		 reflection.a *= border;
 

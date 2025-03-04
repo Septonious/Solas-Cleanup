@@ -275,7 +275,7 @@ void main() {
 
 	/* DRAWBUFFERS:064 */
 	gl_FragData[0].rgb = color;
-    gl_FragData[1] = vec4(pow(color.rgb, vec3(0.125)) * 0.5, 1.0);
+    gl_FragData[1].rgb = pow(color / 256.0, vec3(0.125));
 	gl_FragData[2].g = cloudDepth;
 }
 

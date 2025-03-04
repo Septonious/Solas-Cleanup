@@ -22,29 +22,44 @@ void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 st
 	#endif
 
 	if (0 < visibility) {
-		vec2 planeCoord = worldPos.xz / (length(worldPos.y) + length(worldPos.xz));
-			 planeCoord *= size;
-			 planeCoord += cameraPosition.xz * 0.00001;
-			 planeCoord += frameTimeCounter * 0.0001;
-			 planeCoord = floor(planeCoord * 1024.0 * STAR_AMOUNT) / (1024.0 * STAR_AMOUNT);
+		#ifdef OVERWORLD
+		vec2 planeCoord0 = worldPos.xz / (length(worldPos.y) + length(worldPos.xz));
+			 planeCoord0 += cameraPosition.xz * 0.00001;
+			 planeCoord0 += frameTimeCounter * 0.0001;
+			 planeCoord0 = floor(planeCoord0 * 600.0) / 600.0;
+		#endif
+
+		vec2 planeCoord1 = worldPos.xz / (length(worldPos.y) + length(worldPos.xz));
+			 planeCoord1 *= size;
+			 planeCoord1 += cameraPosition.xz * 0.00001;
+			 planeCoord1 += frameTimeCounter * 0.0001;
+			 planeCoord1 = floor(planeCoord1 * 1000.0 * STAR_AMOUNT) / (1000.0 * STAR_AMOUNT);
+
 			 #if defined END && defined END_VORTEX
 			 if (0.7 < VoS) {
 				vec3 sunVec = mat3(gbufferModelViewInverse) * sunVec;
 				vec2 sunCoord = sunVec.xz / (sunVec.y + length(sunVec));
 				vec2 planeCoord2 = worldPos.xz / (length(worldPos) + worldPos.y) - sunCoord;
 				float spiral1 = getSpiralWarping(planeCoord2) * clamp(VoU, 0.0, 1.0);
-				planeCoord += spiral1 * 0.00025;
-				planeCoord *= 0.15;
+				planeCoord1 += spiral1 * 0.00025;
+				planeCoord1 *= 0.15;
 			 }
 			 #endif
 
-		float star = getNoise(planeCoord);
-			  star*= getNoise(planeCoord + 0.25);
-			  star*= getNoise(planeCoord + 0.50);
-			  star = clamp(star - (0.75 - nebulaFactor * 0.1), 0.0, 1.0);
+		float smallStars = getNoise(planeCoord0 + 10.0);
+			  smallStars*= getNoise(planeCoord0 + 14.0);
+			  smallStars = clamp(smallStars - (0.75 - nebulaFactor * 0.1), 0.0, 1.0);
+			  smallStars *= visibility * STAR_BRIGHTNESS * 7.0;
+			  smallStars *= smallStars;
 
-		stars = vec3(star * visibility * STAR_BRIGHTNESS * 16.0);
-		stars *= stars;
+		float bigStars = getNoise(planeCoord1 + 11.0);
+			  bigStars*= getNoise(planeCoord1 + 13.0);
+			  bigStars*= getNoise(planeCoord1 + 15.0);
+			  bigStars = clamp(bigStars - (0.75 - nebulaFactor * 0.1), 0.0, 1.0);
+			  bigStars *= visibility * STAR_BRIGHTNESS * 21.0;
+			  bigStars *= bigStars;
+
+		stars = vec3(smallStars) + vec3(bigStars);
 
 		#ifdef OVERWORLD
 		stars *= lightNight;
@@ -52,7 +67,7 @@ void drawStars(inout vec3 color, in vec3 worldPos, in vec3 sunVec, inout vec3 st
 		stars *= endLightColSqrt * 0.5;
 		#endif
 
-		color += stars;
+		color += stars * visibility;
 	}
 }
 #endif
