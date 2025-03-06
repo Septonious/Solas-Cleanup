@@ -79,9 +79,8 @@ option.VF_END_THICKNESS=Размер
 screen.LPV_FOG_CONFIG=Настройки Светового Тумана
 
 option.LPV_FOG=Световой Туман
-option.LPV_FOG.comment=Позволяет источникам света подсвечивать туман вокруг.
+option.LPV_FOG.comment=Позволяет источникам света освещать туман вокруг.
 option.LPV_FOG_STRENGTH=Сила
-option.LPV_FOG_SAMPLES=Качество
 
 #----------------------------------------------------------------------------------#
 

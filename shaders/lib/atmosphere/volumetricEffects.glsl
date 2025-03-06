@@ -10,10 +10,12 @@ float lightningFlashEffect(vec3 worldPos, vec3 lightningBoltPosition, float ligh
     return lightningLight;
 }
 
+float getLuminance(vec3 color) {
+	return dot(color, vec3(0.299, 0.587, 0.114));
+}
+
 void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
     vec3 lightFog = vec3(0.0);
-
-    float stepMult = 2.0;
 
 	//Depths
 	float z0 = texture2D(depthtex0, texCoord).r;
@@ -41,19 +43,30 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
 
 	visibility *= 1.0 - blindFactor;
 
-    float maxDist = min(VOXEL_VOLUME_SIZE * 0.5, far);
-    float halfMaxDist = maxDist * 0.5;
-    int sampleCount = int(maxDist / stepMult + 0.001);
-    vec3 traceAdd = normalize(worldPos) * stepMult;
-    vec3 tracePos = traceAdd * dither;
+    //LPV Fog Intensity
+	float intensity = 30.0;
+	#ifdef OVERWORLD
+		  intensity = mix(intensity, 60.0, wetness * eBS);
+		  intensity = mix(75.0, intensity, caveFactor);
+	#endif
+	#ifdef NETHER
+		  intensity = 120.0;
+	#endif
 
-    for (int i = 0; i < sampleCount; i++) {
-        tracePos += traceAdd;
+    //Ray Marching Parameters
+    const float minDist = 2.0;
+    float maxDist = min(far, VOXEL_VOLUME_SIZE * 0.5);
+    int sampleCount = int(maxDist / minDist + 0.01);
 
-        float lTracePos = length(tracePos);
-        if (lTracePos > lViewPosZ1) break;
+    vec3 rayIncrement = normalize(worldPos) * minDist;
+    vec3 rayPos = rayIncrement * dither;
 
-        vec3 voxelPos = ToVoxel(tracePos);
+    //Ray Marching
+    for (int i = 0; i < sampleCount; i++, rayPos += rayIncrement) {
+        float rayLength = length(rayPos);
+        if (rayLength > lViewPosZ1) break;
+
+        vec3 voxelPos = worldToVoxel(rayPos);
              voxelPos /= voxelVolumeSize;
              voxelPos = clamp(voxelPos, 0.0, 1.0);
 
@@ -63,17 +76,18 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
         } else {
             lightVolume = texture(floodfillSampler, voxelPos);
         }
-        vec3 lightSample = lightVolume.rgb;
+        vec3 lightSample = pow(lightVolume.rgb, vec3(1.0 / FLOODFILL_RADIUS));
 
-        float lTracePosM = length(vec3(tracePos.x, tracePos.y * 2.0, tracePos.z));
-        lightSample *= max(0.0, 1.0 - lTracePosM / maxDist);
-        lightSample *= pow2(min(1.0, lTracePos * 0.03125));
+        float rayDistance = length(vec3(rayPos.x, rayPos.y * 2.0, rayPos.z));
+        lightSample *= max(0.0, 1.0 - rayDistance / maxDist);
+        lightSample *= pow2(min(1.0, rayLength * 0.03125));
 
-        if (lTracePos > lViewPosZ0) lightSample *= translucent;
+        if (rayLength > lViewPosZ0) lightSample *= translucent;
         lightFog += lightSample;
     }
 
-    fog += pow(lightFog / sampleCount, vec3(0.25)) * visibility;
+    vec3 result = pow(lightFog / sampleCount, vec3(0.25)) * visibility * intensity * 0.01;
+    fog += result * LPV_FOG_STRENGTH / (1.0 + getLuminance(result));
 }
 #endif
 
@@ -142,7 +156,7 @@ void computeFireflies(inout float fireflies, in vec3 translucent, in float dithe
 		float linearDepth0 = getLinearDepth2(z0);
 		float linearDepth1 = getLinearDepth2(z1);
 
-		//Variables
+		//Ray Marching Parameters
         int sampleCount = 6;
 
 		float maxDist = 96.0;

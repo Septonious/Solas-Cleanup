@@ -126,6 +126,7 @@ float sunVisibility = clamp(dot(sunVec, upVec) + 0.1, 0.0, 0.25) * 4.0;
 
 #include "/lib/atmosphere/fog.glsl"
 
+//Program//
 void main() {
 	vec3 color = texture2D(colortex0, texCoord).rgb;
 
@@ -300,6 +301,7 @@ uniform float timeAngle;
 uniform mat4 gbufferModelView;
 #endif
 
+//Program//
 void main() {
 	//Coords
 	texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;

@@ -47,7 +47,7 @@ void main() {
     float ao = 1.0;
     #endif
 
-    /* DRAWBUFFERS:3 */
+    /* DRAWBUFFERS:1 */
     gl_FragData[0].b = ao;
 }
 

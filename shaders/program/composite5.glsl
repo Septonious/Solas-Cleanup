@@ -47,6 +47,7 @@ float getDiskBlur8(sampler2D colortex, vec2 coord, float strength) {
 }
 #endif
 
+//Program//
 void main() {
 	vec3 color = texture2D(colortex0, texCoord).rgb;
 
@@ -78,6 +79,7 @@ void main() {
 //Varyings//
 out vec2 texCoord;
 
+//Program//
 void main() {
 	//Coords
 	texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;

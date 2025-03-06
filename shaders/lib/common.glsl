@@ -81,7 +81,6 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 //LPV Fog//
 #define LPV_FOG
 #define LPV_FOG_STRENGTH 0.9 //[0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5]
-#define LPV_FOG_SAMPLES 6 //[4 5 6 7 8 9 10]
 
 //Nether Cloudy Fog//
 #define NETHER_CLOUDY_FOG
@@ -124,6 +123,8 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 #define VOXEL_VOLUME_SIZE 192 //[128 192 256 384 512]
 #define FLOODFILL_BRIGHTNESS 1.75 //[1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
 #define FLOODFILL_RADIUS 1.3 //[0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7]
+
+//Handheld Lighting
 #define DYNAMIC_HANDLIGHT
 #define DYNAMIC_HANDLIGHT_STRENGTH 1.50 //[0.50 0.75 1.00 1.25 1.50 1.75 2.00]
 

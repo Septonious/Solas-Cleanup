@@ -15,7 +15,7 @@ uniform float viewWidth, viewHeight;
 uniform sampler2D colortex0;
 
 #ifdef AO
-uniform sampler2D colortex3, depthtex0;
+uniform sampler2D colortex1, depthtex0;
 #endif
 
 #ifdef DISTANT_HORIZONS
@@ -26,7 +26,7 @@ uniform mat4 dhProjectionInverse;
 
 //Optifine Constants//
 #ifdef AO
-const bool colortex3MipmapEnabled = true;
+const bool colortex1MipmapEnabled = true;
 #endif
 
 //Includes//

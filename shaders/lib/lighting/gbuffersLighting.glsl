@@ -48,7 +48,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
 
     //Floodfill Lighting. Works only on Iris
     #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS && !defined DH_TERRAIN && !defined DH_WATER
-    vec3 voxelPos = ToVoxel(worldPos);
+    vec3 voxelPos = worldToVoxel(worldPos);
 
     float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.6));
           floodfillFade = clamp(floodfillFade, 0.0, 1.0);
@@ -60,13 +60,13 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
              voxelSamplePos /= voxelVolumeSize;
              voxelSamplePos = clamp(voxelSamplePos, 0.0, 1.0);
 
-        vec3 lighting = vec3(0.0);
+        vec3 lightVolume = vec3(0.0);
         if ((frameCounter & 1) == 0) {
-            lighting = texture3D(floodfillSamplerCopy, voxelSamplePos).rgb;
+            lightVolume = texture3D(floodfillSamplerCopy, voxelSamplePos).rgb;
         } else {
-            lighting = texture3D(floodfillSampler, voxelSamplePos).rgb;
+            lightVolume = texture3D(floodfillSampler, voxelSamplePos).rgb;
         }
-        voxelLighting = pow(lighting, vec3(1.0 / FLOODFILL_RADIUS));
+        voxelLighting = pow(lightVolume, vec3(1.0 / FLOODFILL_RADIUS));
 
         #ifdef GBUFFERS_ENTITIES
         voxelLighting += pow16(lightmap.x) * blockLightCol;

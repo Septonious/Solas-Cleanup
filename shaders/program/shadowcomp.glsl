@@ -47,9 +47,11 @@ vec3 getFloodfill(sampler3D image, ivec3 previousPos) {
 	return light / 7.1;
 }
 
+//Includes//
 #include "/lib/vx/blocklightColor.glsl"
 #include "/lib/vx/voxelization.glsl"
 
+//Program//
 void main() {
 	ivec3 pos = ivec3(gl_GlobalInvocationID);
 	ivec3 previousPos = ivec3(vec3(pos) - floor(previousCameraPosition) + floor(cameraPosition));

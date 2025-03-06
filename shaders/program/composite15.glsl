@@ -32,6 +32,7 @@ const bool colortex1MipmapEnabled = true;
 #include "/lib/antialiasing/taa.glsl"
 #endif
 
+//Program//
 void main() {
 	vec2 newTexCoord = texCoord;
 	vec3 color = texture2DLod(colortex1, newTexCoord, 0).rgb;
@@ -59,6 +60,7 @@ void main() {
 //Varyings//
 out vec2 texCoord;
 
+//Program//
 void main() {
 	//Coords
 	texCoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;

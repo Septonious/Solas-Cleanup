@@ -26,11 +26,11 @@ float getAmbientOcclusion(float z){
 		vec2 depthOffset = aoDepthOffsets[i] / vec2(viewWidth, viewHeight);
 		float samplez = getLinearDepth(texture2D(depthtex0, texCoord + depthOffset).r);
 		float wg = max(1.0 - 2.0 * far * abs(lz - samplez), 0.00001);
-		ao += texture2D(colortex3, texCoord + sampleOffset).b * wg;
+		ao += texture2D(colortex1, texCoord + sampleOffset).b * wg;
 		tw += wg;
 	}
 	ao /= tw;
-	if(tw < 0.0001) ao = texture2D(colortex3, texCoord).b;
+	if(tw < 0.0001) ao = texture2D(colortex1, texCoord).b;
 	
 	return pow(ao, AO_STRENGTH);
 }
@@ -50,11 +50,11 @@ float getAmbientOcclusionDH(float dhZ){
 		vec2 depthOffset = aoDepthOffsets[i] / vec2(viewWidth, viewHeight);
 		float samplez = GetDHLinearDepth(texture2D(dhDepthTex0, texCoord + depthOffset).r);
 		float wg = max(1.0 - 2.0 * far * abs(lz - samplez), 0.00001);
-		ao += texture2D(colortex3, texCoord + sampleOffset).b * wg;
+		ao += texture2D(colortex1, texCoord + sampleOffset).b * wg;
 		tw += wg;
 	}
 	ao /= tw;
-	if(tw < 0.0001) ao = texture2D(colortex3, texCoord).b;
+	if(tw < 0.0001) ao = texture2D(colortex1, texCoord).b;
 	
 	return pow(ao, AO_STRENGTH + 1.0);
 }
