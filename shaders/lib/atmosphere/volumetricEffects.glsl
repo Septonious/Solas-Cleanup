@@ -54,7 +54,7 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
 	#endif
 
     //Ray Marching Parameters
-    const float minDist = 2.0;
+    const float minDist = 6.0;
     float maxDist = min(far, VOXEL_VOLUME_SIZE * 0.5);
     int sampleCount = int(maxDist / minDist + 0.01);
 
