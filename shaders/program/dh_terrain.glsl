@@ -17,6 +17,10 @@ flat in int mat;
 uniform int isEyeInWater;
 uniform int frameCounter;
 
+#ifdef VC_SHADOWS
+uniform int worldDay, worldTime;
+#endif
+
 uniform float far, near;
 uniform float viewWidth, viewHeight;
 uniform float blindFactor;

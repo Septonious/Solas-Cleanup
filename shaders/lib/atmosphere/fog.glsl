@@ -43,9 +43,9 @@ void getNormalFog(inout vec3 color, in vec3 worldPos, in vec3 atmosphereColor, i
     float fogDistanceFactor = mix(65.0, FOG_DISTANCE * (0.7 + timeBrightness * 0.3), caveFactor);
 	float fogDistance = min(192.0 / farPlane, 1.0) * (100.0 / fogDistanceFactor);
 	float fogVariableHeight = FOG_HEIGHT;
-	#ifndef DISTANT_HORIZONS //Sorry DH simps, no luck for you this time
+
 		  fogVariableHeight += texture2D(noisetex, (worldPos.xz + cameraPosition.xz + frameCounter * 0.04 * VC_SPEED) * 0.00002).b * 70.0 - 70.0;
-	#endif
+
 	float fogAltitudeFactor = clamp(exp2(-max(cameraPosition.y - fogVariableHeight, 0.0) / exp2(FOG_HEIGHT_FALLOFF)), 0.0, 1.0);
 	float fogAltitude = clamp(exp2(-max(worldPos.y + cameraPosition.y - fogVariableHeight, 0.0) / exp2(FOG_HEIGHT_FALLOFF)), 0.0, 1.0);
 	float fogDensity = FOG_DENSITY * (2.0 - caveFactor) * (1.0 - pow(eBS, 0.1) * timeBrightness * 0.5);
@@ -62,7 +62,7 @@ void getNormalFog(inout vec3 color, in vec3 worldPos, in vec3 atmosphereColor, i
     float fog = 1.0 - exp(-(0.0075 + wetness * caveFactor * 0.0025) * lViewPos * fogDistance);
 		  fog = clamp(fog * fogDensity * fogAltitude, 0.0, 1.0);
 
-	vec3 fogCol = mix(caveMinLightCol * atmosphereColor, mix(atmosphereColor, ambientCol, 0.4), caveFactor);
+	vec3 fogCol = mix(caveMinLightCol * atmosphereColor, mix(atmosphereColor, ambientColor, 0.25), caveFactor);
 
 	//Distant Fade
 	#ifdef DISTANT_FADE
@@ -103,13 +103,9 @@ void getNormalFog(inout vec3 color, in vec3 worldPos, in vec3 atmosphereColor, i
 	vec3 fogCol = netherColSqrt.rgb * 0.25;
 	#endif
 
-    //Mixing Colors
-	#if !defined NETHER && defined DEFERRED
-    #if defined DISTANT_HORIZONS && (defined DEFERRED || defined DH_WATER || defined GBUFFERS_WATER)
-    float zMixer = float(texture2D(dhDepthTex0, texCoord).r < 1.0);
-    #else
+    //Mixing Colors depending on depth
+	#if !defined NETHER && defined DEFERRED && !defined DISTANT_HORIZONS
     float zMixer = float(texture2D(depthtex1, texCoord).r < 1.0);
-    #endif
 
 	#if MC_VERSION >= 12104
 		  zMixer = mix(zMixer, 1.0, isPaleGarden);

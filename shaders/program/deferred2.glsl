@@ -261,6 +261,7 @@ void main() {
 	Fog(color, viewPos, worldPos, atmosphereColor);
 	#endif
 
+	//Volumetric Clouds
 	#if defined VC || defined END_CLOUDY_FOG
 	vc.rgb = pow(vc.rgb, vec3(1.0 / 2.2));
 
