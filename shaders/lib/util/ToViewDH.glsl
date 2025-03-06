@@ -6,9 +6,9 @@ vec3 ToViewDH(vec2 texCoord, float z, float dhZ) {
 	#ifdef DISTANT_HORIZONS
     	if (z < 1.0) {
 	#endif
-            vec4 iProjDiag = vec4(gbufferProjectionInverse[0].x,
-                                  gbufferProjectionInverse[1].y,
-                                  gbufferProjectionInverse[2].zw);
+            iProjDiag = vec4(gbufferProjectionInverse[0].x,
+                             gbufferProjectionInverse[1].y,
+                             gbufferProjectionInverse[2].zw);
 
     		pos = vec3(texCoord, z) * 2.0 - 1.0;
     		viewPos = iProjDiag * pos.xyzz + gbufferProjectionInverse[3];

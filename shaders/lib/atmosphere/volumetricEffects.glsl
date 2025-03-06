@@ -11,14 +11,21 @@ float lightningFlashEffect(vec3 worldPos, vec3 lightningBoltPosition, float ligh
 }
 
 void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
-    vec3 finalFog = vec3(0.0);
+    vec3 lightFog = vec3(0.0);
+
+    float stepMult = 2.0;
 
 	//Depths
 	float z0 = texture2D(depthtex0, texCoord).r;
 	float z1 = texture2D(depthtex1, texCoord).r;
 
-	//Positions
-	vec3 viewPos = ToView(vec3(texCoord.xy, z0));
+    //Positions
+	vec3 viewPosZ0 = ToView(vec3(texCoord.xy, z0));
+    vec3 viewPosZ1 = ToView(vec3(texCoord.xy, z1));
+	vec3 worldPos = ToWorld(viewPosZ1);
+
+    float lViewPosZ0 = length(viewPosZ0);
+    float lViewPosZ1 = length(viewPosZ1);
 
 	//Total LPV Fog Visibility
     float visibility = int(z0 > 0.56);
@@ -34,88 +41,39 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
 
 	visibility *= 1.0 - blindFactor;
 
-	float lightIntensity = 20.0 * (0.6 + eBS * eBS * 0.4);
-	#ifdef OVERWORLD
-		  lightIntensity = mix(lightIntensity, 30.0, wetness * eBS);
-		  lightIntensity = mix(35.0, lightIntensity, caveFactor);
-	#endif
-	#ifdef NETHER
-		  lightIntensity = 40.0;
-	#endif
+    float maxDist = min(VOXEL_VOLUME_SIZE * 0.5, far);
+    float halfMaxDist = maxDist * 0.5;
+    int sampleCount = int(maxDist / stepMult + 0.001);
+    vec3 traceAdd = normalize(worldPos) * stepMult;
+    vec3 tracePos = traceAdd * dither;
 
-	if (visibility > 0.0) {
-		//Linear Depths
-		float linearDepth0 = getLinearDepth2(z0);
-		float linearDepth1 = getLinearDepth2(z1);
+    for (int i = 0; i < sampleCount; i++) {
+        tracePos += traceAdd;
 
-		//Variables
-        int sampleCount = LPV_FOG_SAMPLES;
+        float lTracePos = length(tracePos);
+        if (lTracePos > lViewPosZ1) break;
 
-		float maxDist = VOXEL_VOLUME_SIZE;
-		float minDist = (maxDist / sampleCount) * 0.5;
-		float maxCurrentDist = min(linearDepth1, maxDist);
+        vec3 voxelPos = ToVoxel(tracePos);
+             voxelPos /= voxelVolumeSize;
+             voxelPos = clamp(voxelPos, 0.0, 1.0);
 
-		//Ray Marching
-		for (int i = 0; i < sampleCount; i++) {
-			#ifdef NETHER
-			float currentDist = (i + dither) * minDist;
-			#else
-			float currentDist = mix(exp2(i + dither) - 0.95, (i + dither) * minDist, eBS * eBS);
-			#endif
+        vec4 lightVolume = vec4(0.0);
+        if ((frameCounter & 1) == 0) {
+            lightVolume = texture(floodfillSamplerCopy, voxelPos);
+        } else {
+            lightVolume = texture(floodfillSampler, voxelPos);
+        }
+        vec3 lightSample = lightVolume.rgb;
 
-			if (currentDist > maxCurrentDist || linearDepth1 < currentDist || (linearDepth0 < currentDist && translucent.rgb == vec3(0.0))) {
-				break;
-			}
+        float lTracePosM = length(vec3(tracePos.x, tracePos.y * 2.0, tracePos.z));
+        lightSample *= max(0.0, 1.0 - lTracePosM / maxDist);
+        lightSample *= pow2(min(1.0, lTracePos * 0.03125));
 
-            vec3 worldPos = ToWorld(ToView(vec3(texCoord, getLogarithmicDepth(currentDist))));
+        if (lTracePos > lViewPosZ0) lightSample *= translucent;
+        lightFog += lightSample;
+    }
 
-			if (length(worldPos.xz) < VOXEL_VOLUME_SIZE) {
-                float lightning = min(lightningFlashEffect(worldPos, lightningBoltPosition.xyz, 256.0) * lightningBoltPosition.w * 4.0, 1.0);
-
-				float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.5));
-					  floodfillFade = clamp(floodfillFade, 0.0, 1.0);
-
-                vec3 voxelPos = ToVoxel(worldPos);
-
-                vec3 voxelSamplePos = voxelPos;
-                     voxelSamplePos /= voxelVolumeSize;
-                     voxelSamplePos = clamp(voxelSamplePos, 0.0, 1.0);
-
-				vec3 lighting = vec3(0.0);
-				if ((frameCounter & 1) == 0) {
-					lighting = texture3D(floodfillSamplerCopy, voxelSamplePos).rgb;
-				} else {
-					lighting = texture3D(floodfillSampler, voxelSamplePos).rgb;
-				}
-				vec3 voxelLighting = pow(lighting, vec3(1.0 / FLOODFILL_RADIUS));
-				vec3 lpvFog = mix(voxelLighting * lightIntensity * LPV_FOG_STRENGTH, vec3(0.0), floodfillFade);
-
-				#ifdef NETHER_CLOUDY_FOG
-				vec3 npos = (worldPos + cameraPosition) * VF_NETHER_FREQUENCY + vec3(frameTimeCounter * VF_NETHER_SPEED, 0.0, 0.0);
-
-				float n3da = texture2D(noisetex, npos.xz * 0.001 + floor(npos.y * 0.1) * 0.2).r;
-				float n3db = texture2D(noisetex, npos.xz * 0.001 + floor(npos.y * 0.1 + 1.0) * 0.2).r;
-
-				float cloudyNoise = mix(n3da, n3db, fract(npos.y * 0.1));
-					  cloudyNoise = max(cloudyNoise - 0.45, 0.0);
-					  cloudyNoise = min(cloudyNoise * 8.0, 1.0);
-				lpvFog += cloudyNoise * (1.0 + cloudyNoise * cloudyNoise) * netherColSqrt * VF_NETHER_STRENGTH;
-				#endif
-
-				//Translucency Blending
-				if (linearDepth0 < currentDist) {
-					lpvFog *= translucent.rgb;
-				}
-
-                float currentSampleIntensity = (currentDist / maxDist) / sampleCount;
-
-				finalFog += lpvFog * currentSampleIntensity;
-			}
-		}
-		finalFog *= visibility;
-	}
-
-    fog += finalFog;
+    fog += pow(lightFog / sampleCount, vec3(0.25)) * visibility;
 }
 #endif
 
