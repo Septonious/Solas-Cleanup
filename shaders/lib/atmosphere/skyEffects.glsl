@@ -265,13 +265,13 @@ void drawPlanarClouds(inout vec3 color, in vec3 atmosphereColor, in vec3 worldPo
 
     //Sampling
 	vec3 planeCoord = worldPos * (cloudHeightFactor / worldPos.y) * 0.2;
-         planeCoord.x *= 2.00;
-         planeCoord.z *= 0.75;
-	vec2 coord = cameraPosition.xz * 0.0001 + planeCoord.xz + frameTimeCounter * 0.001;
 
-	if (5.0 > length(planeCoord.xz)) {
+	if (2.0 > length(planeCoord.xz)) {
+		 planeCoord.x *= 2.00;
+         planeCoord.z *= 0.75;
+		vec2 coord = cameraPosition.xz * 0.0001 + planeCoord.xz + frameTimeCounter * 0.001;
 		float noise = samplePlanarCloudNoise(coord);
-		float lightingNoise = samplePlanarCloudNoise(coord + normalize(ToWorld(lightVec * 10000.0)).xy * 0.1);
+		float noiseL = samplePlanarCloudNoise(coord + normalize(ToWorld(lightVec * 1000000.0)).xz);
 
 		//Lighting and coloring
 		#ifdef AURORA
@@ -293,22 +293,20 @@ void drawPlanarClouds(inout vec3 color, in vec3 atmosphereColor, in vec3 worldPo
 		auroraVisibility *= visibilityMultiplier;
 		#endif
 
-		pc = noise * VoU * pow(length(planeCoord.y), 0.125) * (1.0 - wetness) * (1.0 - volumetricClouds) * caveFactor;
+		pc = noise * pow(VoU, 1.25) * (1.0 - wetness) * (1.0 - volumetricClouds) * caveFactor;
 
-		float noiseDifference = noise - lightingNoise;
-		float morningEveningFactor = mix(1.0, 0.66, sqrt(sunVisibility) * (1.0 - timeBrightnessSqrt));
-		float cloudLighting = min(mix(noise * noise, lightingNoise, 0.25), 1.0);
+		float cloudLighting = (noiseL - noise * 0.5) * shadowFade * noise;
 
 		vec3 cloudAmbientColor = mix(ambientCol, atmosphereColor * atmosphereColor, 0.5 * sunVisibility);
-			cloudAmbientColor *= 0.25 + sunVisibility * sunVisibility * (0.2 - wetness * 0.2);
+			 cloudAmbientColor *= 0.25 + sunVisibility * sunVisibility * (0.2 - wetness * 0.2);
 		vec3 cloudLightColor = mix(lightCol, mix(lightCol, atmosphereColor, 0.5 * sunVisibility) * atmosphereColor * 2.0, sunVisibility * (1.0 - timeBrightness * 0.33));
-			cloudLightColor *= morningEveningFactor * (2.0 + pow8(VoL) * 4.0);
+			 cloudLightColor *= 1.0 + pow24(VoL) * 3.0;
 
 		vec3 cloudColor = mix(cloudLightColor, cloudAmbientColor, cloudLighting);
-			cloudColor = pow(cloudColor, vec3(1.0 / 2.2));
-			#ifdef AURORA
-			cloudColor = mix(cloudColor, vec3(0.4, 2.5, 0.9) * auroraVisibility, auroraVisibility * 0.05);
-			#endif
+			 cloudColor = pow(cloudColor, vec3(1.0 / 2.2));
+			 #ifdef AURORA
+			 cloudColor = mix(cloudColor, vec3(0.4, 2.5, 0.9) * auroraVisibility, auroraVisibility * 0.05);
+			 #endif
 
 		color = mix(color, cloudColor * PLANAR_CLOUDS_BRIGHTNESS, pc * PLANAR_CLOUDS_OPACITY);
 	}
