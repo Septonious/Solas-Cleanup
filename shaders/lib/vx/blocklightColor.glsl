@@ -81,11 +81,11 @@ const vec3[] blocklightColorArray = vec3[](
     //Nether Portal
     vec3(NP_R, NP_G, NP_B) * NP_I,
     //Orchre Froglight
-    normalize(vec3(1.00, 0.55, 0.25)) * 5.0,
+    normalize(vec3(1.00, 0.55, 0.25)) * 4.0,
     //Verdant Froglight
-    normalize(vec3(0.0, 1.00, 0.05)) * 5.0,
+    normalize(vec3(0.0, 1.00, 0.05)) * 4.0,
     //Pearlescent Froglight
-    normalize(vec3(1.00, 0.20, 0.90)) * 5.0,
+    normalize(vec3(1.00, 0.20, 0.90)) * 4.0,
 	#ifdef EMISSIVE_FLOWERS
     //Red flowers
     normalize(vec3(1.00, 0.05, 0.05)) * 0.20,

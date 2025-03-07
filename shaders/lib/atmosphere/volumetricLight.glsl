@@ -54,7 +54,7 @@ vec3 distortShadow(vec3 shadowPos) {
 void computeVL(inout vec3 vl, in vec3 translucent, in float dither) {
 	vec3 finalVL = vec3(0.0);
 
-	int sampleCount = VL_SAMPLES;
+	int sampleCount = int(VL_SAMPLES + 2 * mefade);
 
 	//Depth
 	float z0 = texture2D(depthtex0, texCoord).r;
@@ -78,8 +78,8 @@ void computeVL(inout vec3 vl, in vec3 translucent, in float dither) {
 	vec3 sampleStepS = shadowPos - startPos;
 	vec3 sampleStepW = worldPos - gbufferModelViewInverse[3].xyz;
 
-	float minDistFactor = 2.0;
-	float maxDistFactor = 384.0;
+	float minDistFactor = 16.0;
+	float maxDistFactor = shadowDistance + 256.0;
 	#ifdef DISTANT_HORIZONS
 		  maxDistFactor += dhRenderDistance;
 	#endif

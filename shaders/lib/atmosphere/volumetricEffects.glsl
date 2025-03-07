@@ -44,17 +44,21 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
 	visibility *= 1.0 - blindFactor;
 
     //LPV Fog Intensity
-	float intensity = 30.0;
+	float intensity = 160.0;
 	#ifdef OVERWORLD
-		  intensity = mix(intensity, 60.0, wetness * eBS);
-		  intensity = mix(75.0, intensity, caveFactor);
+          intensity *= 1.0 - sunVisibility * eBS * 0.25;
+		  intensity = mix(intensity, 180.0, wetness * eBS);
+		  intensity = mix(200.0, intensity, caveFactor);
 	#endif
 	#ifdef NETHER
 		  intensity = 120.0;
 	#endif
 
     //Ray Marching Parameters
-    const float minDist = 6.0;
+    float minDist = 3.0;
+    #ifdef OVERWORLD
+          minDist += 4.0 * eBS;
+    #endif
     float maxDist = min(far, VOXEL_VOLUME_SIZE * 0.5);
     int sampleCount = int(maxDist / minDist + 0.01);
 
@@ -76,18 +80,18 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
         } else {
             lightVolume = texture(floodfillSampler, voxelPos);
         }
+
         vec3 lightSample = pow(lightVolume.rgb, vec3(1.0 / FLOODFILL_RADIUS));
 
         float rayDistance = length(vec3(rayPos.x, rayPos.y * 2.0, rayPos.z));
         lightSample *= max(0.0, 1.0 - rayDistance / maxDist);
-        lightSample *= pow2(min(1.0, rayLength * 0.03125));
 
         if (rayLength > lViewPosZ0) lightSample *= translucent;
         lightFog += lightSample;
     }
 
-    vec3 result = pow(lightFog / sampleCount, vec3(0.25)) * visibility * intensity * 0.01;
-    fog += result * LPV_FOG_STRENGTH / (1.0 + getLuminance(result));
+    vec3 result = pow(lightFog / sampleCount, vec3(0.5)) * visibility * intensity * 0.01 * LPV_FOG_STRENGTH;
+    fog += result * pow(length(result), 0.75);
 }
 #endif
 
