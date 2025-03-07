@@ -50,12 +50,12 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     #if !defined GBUFFERS_BASIC && !defined GBUFFERS_WATER && !defined GBUFFERS_TEXTURED && defined IS_IRIS && !defined DH_TERRAIN && !defined DH_WATER
     vec3 voxelPos = worldToVoxel(worldPos);
 
-    float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.6));
+    float floodfillFade = maxOf(abs(worldPos) / (voxelVolumeSize * 0.5));
           floodfillFade = clamp(floodfillFade, 0.0, 1.0);
 
     vec3 voxelLighting = vec3(0.0);
 
-    if (isInsideVoxelVolume(voxelPos)) {
+    if (isInsideVoxelVolume(voxelPos) && emission == 0.0) {
         vec3 voxelSamplePos = voxelPos + worldNormal;
              voxelSamplePos /= voxelVolumeSize;
              voxelSamplePos = clamp(voxelSamplePos, 0.0, 1.0);
@@ -185,7 +185,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     #elif defined END
     vec3 sceneLighting = mix(endAmbientCol, endLightCol, shadow) * 0.25;
     #elif defined NETHER
-    vec3 sceneLighting = pow(netherColSqrt, vec3(0.75)) * 0.03;
+    vec3 sceneLighting = pow(netherColSqrt, vec3(0.75)) * 0.05;
     #endif
 
     //Specular Highlight

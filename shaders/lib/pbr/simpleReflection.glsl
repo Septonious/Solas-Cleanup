@@ -7,7 +7,7 @@ void getReflection(inout vec4 color, in vec3 viewPos, in vec3 normal, in float f
 	#endif
 
 	#ifndef OVERWORLD
-	int sampleCount = 15;
+	int sampleCount = 30;
 	#else
 	int sampleCount = int(20 - eBS * 10);
 	#endif

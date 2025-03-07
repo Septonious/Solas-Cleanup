@@ -83,6 +83,32 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
 
         vec3 lightSample = pow(lightVolume.rgb, vec3(1.0 / FLOODFILL_RADIUS));
 
+        #ifdef NETHER_CLOUDY_FOG
+        vec3 npos = (rayPos + cameraPosition) * VF_NETHER_FREQUENCY + vec3(frameTimeCounter * VF_NETHER_SPEED, 0.0, 0.0);
+
+        float n3da = texture2D(noisetex, npos.xz * 0.001 + floor(npos.y * 0.1) * 0.2).r;
+        float n3db = texture2D(noisetex, npos.xz * 0.001 + floor(npos.y * 0.1 + 1.0) * 0.2).r;
+
+        float cloudyNoise = mix(n3da, n3db, fract(npos.y * 0.1));
+              cloudyNoise = max(cloudyNoise - 0.45, 0.0);
+              cloudyNoise = min(cloudyNoise * 8.0, 1.0);
+              cloudyNoise = cloudyNoise * (1.0 + cloudyNoise * cloudyNoise);
+        lightSample = lightSample * (0.5 + cloudyNoise * 1.5) + cloudyNoise * netherCol * VF_NETHER_STRENGTH / sampleCount;
+        #endif
+
+        #ifdef LPV_CLOUDY_FOG
+        vec3 npos = (rayPos + cameraPosition) * 6.0 + vec3(frameTimeCounter, 0.0, 0.0);
+
+        float n3da = texture2D(noisetex, npos.xz * 0.001 + floor(npos.y * 0.1) * 0.1).r;
+        float n3db = texture2D(noisetex, npos.xz * 0.001 + floor(npos.y * 0.1 + 1.0) * 0.1).r;
+
+        float cloudyNoise = mix(n3da, n3db, fract(npos.y * 0.1));
+              cloudyNoise = max(cloudyNoise - 0.45, 0.0);
+              cloudyNoise = min(cloudyNoise * 8.0, 1.0);
+              cloudyNoise = cloudyNoise * (1.0 + cloudyNoise * cloudyNoise);
+        lightSample *= 0.4 + cloudyNoise * 0.6;
+        #endif
+
         float rayDistance = length(vec3(rayPos.x, rayPos.y * 2.0, rayPos.z));
         lightSample *= max(0.0, 1.0 - rayDistance / maxDist);
 
@@ -91,7 +117,7 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
     }
 
     vec3 result = pow(lightFog / sampleCount, vec3(0.5)) * visibility * intensity * 0.01 * LPV_FOG_STRENGTH;
-    fog += result * pow(length(result), 0.75);
+    fog += result * max(pow(length(result), 0.75), 1.0 - caveFactor);
 }
 #endif
 
