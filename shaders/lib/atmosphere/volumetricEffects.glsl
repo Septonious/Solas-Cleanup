@@ -106,7 +106,7 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
               cloudyNoise = max(cloudyNoise - 0.45, 0.0);
               cloudyNoise = min(cloudyNoise * 8.0, 1.0);
               cloudyNoise = cloudyNoise * (1.0 + cloudyNoise * cloudyNoise);
-        lightSample *= 0.4 + cloudyNoise * 0.6;
+        lightSample *= 0.5 + cloudyNoise * 0.5;
         #endif
 
         float rayDistance = length(vec3(rayPos.x, rayPos.y * 2.0, rayPos.z));
