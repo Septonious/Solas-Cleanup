@@ -80,14 +80,19 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
 
     //Shadow Calculation
     //Some code made by Emin and gri573
+    #ifdef REALTIME_SHADOWS
     float shadowLightingFade = maxOf(abs(worldPos) / (vec3(shadowDistance, shadowDistance + 64.0, shadowDistance)));
           shadowLightingFade = clamp(shadowLightingFade, 0.0, 1.0);
           shadowLightingFade = 1.0 - pow3(shadowLightingFade);
+    #else
+    float shadowLightingFade = 0.0;
+    #endif
 
     //Subsurface Scattering
     float sss = 0.0;
 
     if (0 < shadowLightingFade) {
+        #ifdef REALTIME_SHADOWS
         #if defined OVERWORLD && defined GBUFFERS_TERRAIN
         if (0 < subsurface && 0 < lightmap.y) {
             float VoL = clamp(dot(normalize(viewPos), lightVec), 0.0, 1.0);
@@ -138,6 +143,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
         float viewDistance = 1.0 - clamp(lViewPos * 0.01, 0.0, 1.0);
         
         shadow = computeShadow(shadowPos, offset, lightmap.y, subsurface, viewDistance);
+        #endif
     }
 
     vec3 realShadow = shadow;

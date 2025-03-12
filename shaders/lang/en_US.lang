@@ -193,6 +193,7 @@ option.VPS_BLUR_STRENGTH=VPS Strength
 option.SHADOW_SAMPLE_COUNT=Shadow Samples
 option.SHADOW_COLOR=Colored Shadows
 option.ENTITY_SHADOWS=Entity Shadows
+option.REALTIME_SHADOWS=Realtime Shadows
 
 #----------------------------------------------------------------------------------#
 

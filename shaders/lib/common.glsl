@@ -11,6 +11,7 @@ const float sunPathRotation = -40.0;
 #endif
 const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 
+#define REALTIME_SHADOWS
 #define SHADOW_COLOR
 //#define VPS
 #define VPS_BLUR_STRENGTH 0.55 //[0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80]
@@ -495,6 +496,9 @@ float linearStep(float edge0, float edge1, float x) {
 #endif
 
 #ifdef ENTITY_SHADOWS
+#endif
+
+#ifdef REALTIME_SHADOWS
 #endif
 
 #if defined IS_IRIS && !defined MC_OS_MAC
