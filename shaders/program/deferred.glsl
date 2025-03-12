@@ -4,7 +4,7 @@
 #ifdef FSH
 
 //Varyings//
-varying vec2 texCoord;
+in vec2 texCoord;
 
 //Uniforms//
 #ifdef AO

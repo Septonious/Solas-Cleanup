@@ -69,6 +69,11 @@ vec3 lightVec = sunVec;
 #include "/lib/color/netherColor.glsl"
 #include "/lib/vx/blocklightColor.glsl"
 #include "/lib/vx/voxelization.glsl"
+
+#ifdef DYNAMIC_HANDLIGHT
+#include "/lib/lighting/handlight.glsl"
+#endif
+
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 

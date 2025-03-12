@@ -82,7 +82,10 @@ vec3 lightVec = sunVec;
 #include "/lib/pbr/ggx.glsl"
 #endif
 
+#ifdef DYNAMIC_HANDLIGHT
 #include "/lib/lighting/handlight.glsl"
+#endif
+
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 

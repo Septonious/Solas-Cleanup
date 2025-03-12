@@ -54,15 +54,19 @@ vec3 distortShadow(vec3 shadowPos) {
 void computeVL(inout vec3 vl, in vec3 translucent, in float dither) {
 	vec3 finalVL = vec3(0.0);
 
+	#ifdef OVERWORLD
 	int sampleCount = int(VL_SAMPLES + 2 * mefade);
+	#else
+	int sampleCount = VL_SAMPLES;
+	#endif
 
 	//Depth
 	float z0 = texture2D(depthtex0, texCoord).r;
 	
 	#ifdef DISTANT_HORIZONS
-		float dhZ = texture2D(dhDepthTex, texCoord).r;
+	float dhZ = texture2D(dhDepthTex, texCoord).r;
 	#else
-		float dhZ = 0.0;
+	float dhZ = 0.0;
 	#endif
 
 	//Positions

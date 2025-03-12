@@ -24,6 +24,10 @@ uniform int frameCounter;
 uniform int worldDay, worldTime;
 #endif
 
+#ifdef DYNAMIC_HANDLIGHT
+uniform int heldItemId, heldItemId2;
+#endif
+
 #ifdef DISTANT_HORIZONS
 uniform float dhFarPlane;
 #endif
@@ -100,6 +104,11 @@ vec3 lightVec = sunVec;
 #include "/lib/util/ToShadow.glsl"
 #include "/lib/color/lightColor.glsl"
 #include "/lib/color/netherColor.glsl"
+
+#ifdef DYNAMIC_HANDLIGHT
+#include "/lib/lighting/handlight.glsl"
+#endif
+
 #include "/lib/lighting/shadows.glsl"
 #include "/lib/lighting/gbuffersLighting.glsl"
 
