@@ -498,6 +498,9 @@ float linearStep(float edge0, float edge1, float x) {
 #ifdef ENTITY_SHADOWS
 #endif
 
+#ifdef GI
+#endif
+
 #ifdef REALTIME_SHADOWS
 #endif
 
