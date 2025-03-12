@@ -66,14 +66,8 @@ uniform vec3 cameraPosition;
 
 uniform sampler2D texture;
 uniform sampler2D noisetex;
-
-#ifdef WATER_FOG
 uniform sampler2D depthtex1;
-#endif
-
-#ifdef VC
 uniform sampler2D gaux1;
-#endif
 
 #ifdef WATER_REFLECTIONS
 uniform sampler2D gaux3;
