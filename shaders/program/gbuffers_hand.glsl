@@ -19,6 +19,10 @@ uniform int frameCounter;
 uniform int worldDay, worldTime;
 #endif
 
+#ifdef DYNAMIC_HANDLIGHT
+uniform int heldItemId, heldItemId2;
+#endif
+
 uniform float viewWidth, viewHeight;
 uniform float blindFactor;
 uniform float nightVision;

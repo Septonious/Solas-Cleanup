@@ -78,6 +78,11 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     }
     #endif
 
+    //Dynamic Hand Lighting
+    #ifdef DYNAMIC_HANDLIGHT
+    getHandLightColor(blockLighting, normal, worldPos + relativeEyePosition);
+    #endif
+
     //Shadow Calculation
     //Some code made by Emin and gri573
     #ifdef REALTIME_SHADOWS
