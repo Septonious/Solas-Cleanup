@@ -263,7 +263,7 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
           aoMixer *= 1.0 - clamp(NoL, 0.0, 1.0) * 0.75;
     #endif
     albedo.rgb = mix(albedo.rgb, albedo.rgb * ao, min(aoMixer, 1.0) * AO_STRENGTH);
-    albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, min(aoMixer, 1.0) * AO_STRENGTH);
+    albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, min(aoMixer, 1.0) * AO_STRENGTH * 0.5);
     #endif
 
     //RSM GI//
