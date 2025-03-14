@@ -200,6 +200,7 @@ option.REALTIME_SHADOWS=Realtime Shadows
 screen.GI=Global Illumination Config
 
 option.GI=Global Illumination
+option.GI.comment=§e[*]§r Requires realtime shadows to be enabled. §c[-]§r Incompatible with cloud shadows.
 option.GI_RADIUS=GI Radius
 option.GI_SAMPLES=GI Quality
 option.GI_BRIGHTNESS=GI Brightness
@@ -457,6 +458,8 @@ option.CHROMATIC_ABERRATION=Chromatic Aberration (CA)
 option.CHROMATIC_ABERRATION_STRENGTH=CA Strength
 option.LENS_FLARE=Lens Flare
 option.LENS_FLARE_STRENGTH=Lens Flare Strength
+option.MOTION_BLUR=Motion Blur
+option.MOTION_BLUR_STRENGTH=Motion Blur Strength
 
 #----------------------------------------------------------------------------------#
 

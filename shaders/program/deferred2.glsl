@@ -58,7 +58,7 @@ uniform vec4 lightningBoltPosition;
 #endif
 
 #ifdef MILKY_WAY
-uniform sampler2D depthtex2;
+uniform sampler2D gaux4;
 #endif
 
 uniform sampler2D colortex0;

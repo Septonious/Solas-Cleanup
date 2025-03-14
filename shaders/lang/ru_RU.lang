@@ -458,6 +458,8 @@ option.CHROMATIC_ABERRATION.comment=Добавляет синие и красн�
 option.CHROMATIC_ABERRATION_STRENGTH=Сила ХА
 option.LENS_FLARE=Блики
 option.LENS_FLARE_STRENGTH=Яркость бликов
+option.MOTION_BLUR=Размытие в Движении
+option.MOTION_BLUR_STRENGTH=Сила Размытия в Движении
 
 #----------------------------------------------------------------------------------#
 

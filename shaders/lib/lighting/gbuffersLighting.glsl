@@ -151,7 +151,6 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
 
     #if defined PBR && defined GBUFFERS_TERRAIN
     shadow *= parallaxShadow;
-    fakeShadow *= parallaxShadow;
     #endif
 
     shadow *= clamp(NoLm * 1.01 - 0.01, 0.0, 1.0);
@@ -262,7 +261,22 @@ void gbuffersLighting(inout vec4 albedo, in vec3 screenPos, in vec3 viewPos, in 
     albedo.rgb = mix(albedo.rgb, albedo.rgb * ao * ao, min(1.0, aoMixer * aoMixer * AO_STRENGTH));
     #endif
 
+    //RSM GI//
+    vec3 gi = vec3(0.0);
+
+    #if defined GI && (defined GBUFFERS_TERRAIN || defined GBUFFERS_ENTITIES)
+    vec2 prevScreenPos = Reprojection(screenPos);
+    gi = texture2D(gaux1, prevScreenPos).rgb;
+    gi = pow4(gi) * 32.0 * lightmap.y * sunVisibility * shadowFade;
+
+    #if defined OVERWORLD
+    gi *= lightCol;
+    #elif defined END
+    gi *= endLightCol;
+    #endif
+    #endif
+
     albedo.rgb = pow(albedo.rgb, vec3(2.2));
-    albedo.rgb *= sceneLighting * vanillaDiffuse + blockLighting + emission + specularHighlight;
+    albedo.rgb *= sceneLighting * vanillaDiffuse + blockLighting + emission + specularHighlight + gi;
     albedo.rgb = pow(albedo.rgb, vec3(1.0 / 2.2));
 }

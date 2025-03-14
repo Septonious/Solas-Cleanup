@@ -38,6 +38,6 @@ void getReflection(inout vec4 color, in vec3 viewPos, in vec3 normal, in float f
 		vec4 reflection = texture2DLod(colortex0, reflectPos.xy, max(lod - 1.0, 0.0));
 		reflection.a *= border;
 
-		color.rgb = mix(color.rgb, mix(falloff, reflection.rgb, reflection.a), fresnel);
+		color.rgb = mix(color.rgb, mix(falloff, reflection.rgb, reflection.a), fresnel * pow4(smoothness));
 	}
 }

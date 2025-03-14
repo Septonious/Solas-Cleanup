@@ -9,7 +9,8 @@ in vec2 texCoord;
 //Uniforms//
 uniform int frameCounter;
 
-uniform float viewWidth, viewHeight;
+uniform float viewWidth, viewHeight, aspectRatio;
+uniform float far, near;
 
 #ifdef BLOOM
 #ifdef TAA
@@ -23,6 +24,23 @@ uniform ivec2 eyeBrightnessSmooth;
 #endif
 #endif
 
+#ifdef DOF
+#ifndef MANUAL_FOCUS
+uniform float centerDepthSmooth;
+#else
+float centerDepthSmooth = ((DOF_FOCUS - near) * far) / ((far - near) * DOF_FOCUS);
+#endif
+#endif
+
+#ifdef MOTION_BLUR
+uniform vec3 cameraPosition, previousCameraPosition;
+
+uniform mat4 gbufferPreviousProjection;
+uniform mat4 gbufferPreviousModelView, gbufferModelViewInverse;
+
+uniform sampler2D colortex3;
+#endif
+
 uniform sampler2D colortex0, colortex2;
 uniform sampler2D noisetex;
 uniform sampler2D depthtex0;
@@ -33,7 +51,12 @@ uniform sampler2D colortex1;
 uniform mat4 gbufferProjectionInverse;
 #endif
 
+#ifdef DOF
+uniform mat4 gbufferProjection;
+#endif
+
 //Optifine Constants//
+const bool colortex0MipmapEnabled = true;
 const bool colortex1MipmapEnabled = true;
 const bool colortex2Clear = false;
 
@@ -47,6 +70,15 @@ const bool colortex2Clear = false;
 
 #ifdef BLOOM
 #include "/lib/post/getBloom.glsl"
+#endif
+
+#ifdef DOF
+#include "/lib/util/ToView.glsl"
+#include "/lib/post/computeDOF.glsl"
+#endif
+
+#ifdef MOTION_BLUR
+#include "/lib/post/motionBlur.glsl"
 #endif
 
 //Program//
@@ -68,14 +100,24 @@ void main() {
 
 	float temporalData = 0.0;
 
-	//Bloom
-	#ifdef BLOOM
-	getBloom(color, texCoord);
-	#endif
-
 	//Fast Approximate Antialiasing
 	#ifdef FXAA
 	color = FXAA311(color);
+	#endif
+
+	//Motion Blur
+	#ifdef MOTION_BLUR
+	color = getMotionBlur(color, z0);
+	#endif
+
+	//Depth of Field & Tilt Shift
+	#ifdef DOF
+	color = getDepthOfField(color, texCoord, z0);
+	#endif
+
+	//Bloom
+	#ifdef BLOOM
+	getBloom(color, texCoord);
 	#endif
 
 	//Tonemapping

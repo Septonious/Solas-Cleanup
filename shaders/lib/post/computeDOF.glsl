@@ -60,7 +60,7 @@ vec3 getDepthOfField(vec3 color, vec2 coord, float z0) {
 	if (coc > 0.0 && z0 > 0.56) {
 		for(int i = 0; i < 32; i++) {
 			vec2 offset = blurOffsets32[i] * coc * 0.025 * fovScale * vec2(1.0 / aspectRatio, 1.0);
-			blur += texture2DLod(colortex1, coord + offset, lod).rgb;
+			blur += texture2DLod(colortex0, coord + offset, lod).rgb;
 		}
 		blur /= 32.0;
 	} else blur = color;

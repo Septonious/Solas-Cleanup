@@ -48,11 +48,24 @@ uniform vec3 skyColor;
 uniform vec3 fogColor;
 uniform vec4 entityColor;
 
+#ifdef GI
+uniform vec3 previousCameraPosition;
+#endif
+
 uniform sampler2D texture;
 uniform sampler2D noisetex;
 
+#ifdef GI
+uniform sampler2D gaux1;
+#endif
+
 uniform sampler3D floodfillSampler, floodfillSamplerCopy;
 uniform usampler3D voxelSampler;
+
+#ifdef GI
+uniform mat4 gbufferPreviousModelView;
+uniform mat4 gbufferPreviousProjection;
+#endif
 
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelViewInverse;
@@ -84,6 +97,10 @@ vec3 lightVec = sunVec;
 
 #ifdef DYNAMIC_HANDLIGHT
 #include "/lib/lighting/handlight.glsl"
+#endif
+
+#ifdef GI
+#include "/lib/util/reprojection.glsl"
 #endif
 
 #include "/lib/lighting/shadows.glsl"

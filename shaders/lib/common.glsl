@@ -61,7 +61,7 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 #define VC
 #define VC_FREQUENCY 0.7 //[0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5]
 #define VC_DENSITY 10.0 //[4.0 6.0 8.0 10.0 12.0 14.0 16.0]
-#define VC_AMOUNT 16.25 //[17.00 16.75 16.50 16.25 16.00 15.75 15.50 15.25 15.00]
+#define VC_AMOUNT 16.00 //[17.00 16.75 16.50 16.25 16.00 15.75 15.50 15.25 15.00]
 #define VC_HEIGHT 170.0 //[10.0 20.0 30.0 40.0 50.0 60.0 70.0 80.0 90.0 100.0 110.0 120.0 130.0 140.0 150.0 160.0 170.0 180.0 190.0 200.0 210.0 220.0 230.0 240.0 250.0]
 #define VC_THICKNESS 18.0 //[8.0 10.0 12.0 14.0 16.0 18.0 20.0]
 #define VC_DETAIL 1.0 //[0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
@@ -75,13 +75,13 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 //VL//
 #define VL
 #define VL_STRENGTH 0.40 //[0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
-#define VL_SAMPLES 8 //[5 6 7 8 9 10 11 12 13 14 15 16]
+#define VL_SAMPLES 7 //[5 6 7 8 9 10 11 12 13 14 15 16]
 #define VL_STRENGTH_RATIO 0.40 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50]
 
 //LPV Fog//
 #define LPV_FOG
 #define LPV_CLOUDY_FOG
-#define LPV_FOG_STRENGTH 0.9 //[0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5]
+#define LPV_FOG_STRENGTH 1.1 //[0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5]
 
 //Nether Cloudy Fog//
 #define NETHER_CLOUDY_FOG
@@ -203,7 +203,7 @@ const float shadowMapBias = 1.0 - 25.6 / shadowDistance;
 #define PARALLAX_DEPTH 0.20 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50]
 #define PARALLAX_QUALITY 64 //[32 48 64 80 96 112 128]
 #define PARALLAX_DISTANCE 32 //[8 16 32 48 64 80 96 112 128]
-#define SELF_SHADOW
+//#define SELF_SHADOW
 #define SELF_SHADOW_ANGLE 3.0 //[0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0]
 #define SELF_SHADOW_QUALITY 6 //[4 6 8 10 12 14 16]
 #define SELF_SHADOW_STRENGTH 32 //[4 8 16 32 48 64]
@@ -475,6 +475,10 @@ float linearStep(float edge0, float edge1, float x) {
 
 #if defined GBUFFERS_TEXTURED || defined GBUFFERS_BASIC || defined BLOCKY_CLOUDS || !defined VC
 #undef VC_SHADOWS
+#endif
+
+#if defined VC_SHADOWS || !defined REALTIME_SHADOWS
+#undef GI
 #endif
 
 #if !defined GBUFFERS_TERRAIN

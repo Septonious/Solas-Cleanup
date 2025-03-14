@@ -44,11 +44,11 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
 	visibility *= 1.0 - blindFactor;
 
     //LPV Fog Intensity
-	float intensity = 160.0;
+	float intensity = 140.0;
 	#ifdef OVERWORLD
           intensity *= 1.0 - sunVisibility * eBS * 0.25;
 		  intensity = mix(intensity, 180.0, wetness * eBS);
-		  intensity = mix(200.0, intensity, caveFactor);
+		  intensity = mix(180.0, intensity, caveFactor);
 	#endif
 	#ifdef NETHER
 		  intensity = 120.0;
@@ -93,7 +93,7 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
               cloudyNoise = max(cloudyNoise - 0.45, 0.0);
               cloudyNoise = min(cloudyNoise * 8.0, 1.0);
               cloudyNoise = cloudyNoise * (1.0 + cloudyNoise * cloudyNoise);
-        lightSample = lightSample * (0.5 + cloudyNoise * 1.5) + cloudyNoise * netherCol * VF_NETHER_STRENGTH / sampleCount;
+        lightSample = lightSample * (0.75 + cloudyNoise) + cloudyNoise * netherCol * VF_NETHER_STRENGTH / sampleCount;
         #endif
 
         #ifdef LPV_CLOUDY_FOG
@@ -106,7 +106,7 @@ void computeLPVFog(inout vec3 fog, in vec3 translucent, in float dither) {
               cloudyNoise = max(cloudyNoise - 0.45, 0.0);
               cloudyNoise = min(cloudyNoise * 8.0, 1.0);
               cloudyNoise = cloudyNoise * (1.0 + cloudyNoise * cloudyNoise);
-        lightSample *= 0.5 + cloudyNoise * 0.5;
+        lightSample *= 0.65 + cloudyNoise * 0.35;
         #endif
 
         float rayDistance = length(vec3(rayPos.x, rayPos.y * 2.0, rayPos.z));
