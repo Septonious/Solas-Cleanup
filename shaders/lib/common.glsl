@@ -456,6 +456,7 @@ float linearStep(float edge0, float edge1, float x) {
 #undef WAVING_LEAVES
 #undef FIREFLIES
 #undef GI
+#undef LENS_FLARE
 #endif
 
 #ifndef NETHER
